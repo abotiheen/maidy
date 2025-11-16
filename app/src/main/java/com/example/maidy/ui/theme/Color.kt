@@ -85,3 +85,16 @@ val BookingStatusCancelButton = Color(0xFFFEE2E2)
 val BookingStatusCancelButtonText = Color(0xFFB91C1C)
 val BookingStatusRateButton = Color(0xFFD1FAE5)
 val BookingStatusRateButtonText = Color(0xFF047857)
+
+// Emergency/SOS Screen Colors
+val EmergencyScreenBackground = Color(0xFFDC2626) // Vibrant red
+val EmergencyIconBorder = Color(0xFFFFFFFF)
+val EmergencyIconBackground = Color(0xFFDC2626)
+val EmergencyIconText = Color(0xFFFFFFFF)
+val EmergencyTitleText = Color(0xFFFFFFFF)
+val EmergencyDescriptionText = Color(0xFFFFFFFF)
+val EmergencyCallButton = Color(0xFFFFFFFF)
+val EmergencyCallButtonText = Color(0xFFDC2626)
+val EmergencyCancelButton = Color(0x00FFFFFF) // Transparent
+val EmergencyCancelButtonBorder = Color(0xFFFFFFFF)
+val EmergencyCancelButtonText = Color(0xFFFFFFFF)
