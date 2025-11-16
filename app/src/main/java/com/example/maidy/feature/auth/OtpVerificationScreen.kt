@@ -1,0 +1,180 @@
+package com.example.maidy.feature.auth
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.maidy.feature.auth.components.*
+import com.example.maidy.ui.theme.*
+
+@Composable
+fun OtpVerificationScreen(
+    uiState: AuthUiState,
+    onEvent: (AuthEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(40.dp))
+        
+        // Logo
+        MaidyLogo()
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        // Title
+        MaidyTitle()
+        
+        Spacer(modifier = Modifier.height(48.dp))
+        
+        // Instruction Text
+        Text(
+            text = "Enter 4-digit code sent to your phone",
+            fontSize = 16.sp,
+            color = MaidyTextPrimary,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(bottom = 32.dp)
+        )
+        
+        // OTP Input
+        OtpInputField(
+            otpValue = uiState.otpCode,
+            onOtpChange = { onEvent(AuthEvent.OtpCodeChanged(it)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        // Resend Code
+        Text(
+            text = "Resend Code",
+            fontSize = 14.sp,
+            color = MaidyBlue,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.clickable { 
+                onEvent(AuthEvent.ResendCodeClicked) 
+            }
+        )
+        
+        Spacer(modifier = Modifier.weight(1f))
+        
+        // Error Message
+        if (uiState.errorMessage != null) {
+            Text(
+                text = uiState.errorMessage,
+                fontSize = 14.sp,
+                color = if (uiState.errorMessage.contains("success", ignoreCase = true))
+                    MaidySuccessGreen
+                else
+                    MaidyErrorRed,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+        
+        // Confirm Button
+        PrimaryButton(
+            text = "Confirm",
+            onClick = { onEvent(AuthEvent.ConfirmOtpClicked) },
+            isLoading = uiState.isLoading
+        )
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        // Terms and Conditions
+        TermsAndConditionsText()
+        
+        Spacer(modifier = Modifier.height(32.dp))
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun OtpVerificationScreenPreview() {
+    MaidyTheme {
+        OtpVerificationScreen(
+            uiState = AuthUiState(
+                otpCode = ""
+            ),
+            onEvent = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun OtpVerificationScreenPartialPreview() {
+    MaidyTheme {
+        OtpVerificationScreen(
+            uiState = AuthUiState(
+                otpCode = "12"
+            ),
+            onEvent = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun OtpVerificationScreenFilledPreview() {
+    MaidyTheme {
+        OtpVerificationScreen(
+            uiState = AuthUiState(
+                otpCode = "1234"
+            ),
+            onEvent = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun OtpVerificationScreenLoadingPreview() {
+    MaidyTheme {
+        OtpVerificationScreen(
+            uiState = AuthUiState(
+                otpCode = "1234",
+                isLoading = true
+            ),
+            onEvent = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun OtpVerificationScreenErrorPreview() {
+    MaidyTheme {
+        OtpVerificationScreen(
+            uiState = AuthUiState(
+                otpCode = "1234",
+                errorMessage = "Invalid code. Please try again."
+            ),
+            onEvent = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun OtpVerificationScreenSuccessPreview() {
+    MaidyTheme {
+        OtpVerificationScreen(
+            uiState = AuthUiState(
+                otpCode = "1234",
+                errorMessage = "Code resent successfully"
+            ),
+            onEvent = {}
+        )
+    }
+}
+
