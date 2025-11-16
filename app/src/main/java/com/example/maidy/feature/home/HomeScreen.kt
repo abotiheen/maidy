@@ -2,8 +2,8 @@ package com.example.maidy.feature.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -45,56 +45,76 @@ private fun HomeScreenContent(
     onNavigateToBookingDetails: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .background(MaidyBackgroundWhite)
-            .verticalScroll(rememberScrollState())
     ) {
         // Header with Profile, Title, and Notifications
-        HomeHeader(
-            profileImageUrl = uiState.profileImageUrl,
-            hasNotifications = uiState.hasNotifications,
-            onNotificationClick = {
-                onEvent(HomeUiEvent.OnNotificationClick)
-                onNavigateToNotifications()
-            }
-        )
+        item {
+            HomeHeader(
+                profileImageUrl = uiState.profileImageUrl,
+                hasNotifications = uiState.hasNotifications,
+                onNotificationClick = {
+                    onEvent(HomeUiEvent.OnNotificationClick)
+                    onNavigateToNotifications()
+                }
+            )
+        }
 
         // Greeting
-        GreetingSection(userName = uiState.userName)
+        item {
+            GreetingSection(userName = uiState.userName)
+        }
 
         // Search Bar
-        HomeSearchBar(
-            searchQuery = uiState.searchQuery,
-            onSearchQueryChange = { query ->
-                onEvent(HomeUiEvent.OnSearchQueryChange(query))
-            }
-        )
+        item {
+            HomeSearchBar(
+                searchQuery = uiState.searchQuery,
+                onSearchQueryChange = { query ->
+                    onEvent(HomeUiEvent.OnSearchQueryChange(query))
+                }
+            )
+        }
 
         // Action Buttons
-        ActionButtons(
-            onBookNowClick = {
-                onEvent(HomeUiEvent.OnBookNowClick)
-                onNavigateToBooking()
-            },
-            onScheduleClick = {
-                onEvent(HomeUiEvent.OnScheduleClick)
-                onNavigateToSchedule()
-            }
-        )
+        item {
+            ActionButtons(
+                onBookNowClick = {
+                    onEvent(HomeUiEvent.OnBookNowClick)
+                    onNavigateToBooking()
+                },
+                onScheduleClick = {
+                    onEvent(HomeUiEvent.OnScheduleClick)
+                    onNavigateToSchedule()
+                }
+            )
+        }
 
-        // Recent Bookings Section
-        RecentBookingsSection(
-            bookings = uiState.recentBookings,
-            onBookingClick = { bookingId ->
-                onEvent(HomeUiEvent.OnBookingClick(bookingId))
-                onNavigateToBookingDetails(bookingId)
-            }
-        )
+        // Recent Bookings Section Header
+        item {
+            RecentBookingsSectionHeader()
+        }
+
+        // Recent Bookings List (dynamic)
+        items(
+            items = uiState.recentBookings,
+            key = { booking -> booking.id }
+        ) { booking ->
+            BookingCard(
+                booking = booking,
+                onClick = {
+                    onEvent(HomeUiEvent.OnBookingClick(booking.id))
+                    onNavigateToBookingDetails(booking.id)
+                },
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp)
+            )
+        }
 
         // Add spacing at the bottom for better scroll experience
-        Spacer(modifier = Modifier.height(32.dp))
+        item {
+            Spacer(modifier = Modifier.height(32.dp))
+        }
     }
 }
 
