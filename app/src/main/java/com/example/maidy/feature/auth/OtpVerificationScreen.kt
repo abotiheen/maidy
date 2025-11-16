@@ -22,7 +22,7 @@ fun OtpVerificationScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(40.dp))

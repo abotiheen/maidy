@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -52,22 +51,30 @@ fun PhoneNumberField(
                     color = MaidyBorderLight,
                     shape = RoundedCornerShape(12.dp)
                 )
-                .background(MaidyBackgroundWhite, RoundedCornerShape(12.dp))
-                .padding(horizontal = 16.dp),
+                .background(MaidyBackgroundWhite, RoundedCornerShape(12.dp)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "+964",
-                fontSize = 14.sp,
-                color = MaidyTextPrimary,
-                modifier = Modifier.padding(end = 12.dp)
-            )
+            // Country code section with darker background
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .background(MaidyBackgroundLight)
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "+964",
+                    fontSize = 14.sp,
+                    color = MaidyTextPrimary,
+                    fontWeight = FontWeight.Medium
+                )
+            }
 
             HorizontalDivider(
                 modifier = Modifier
                     .width(1.dp)
-                    .height(24.dp),
-                thickness = DividerDefaults.Thickness, color = MaidyBorderLight
+                    .fillMaxHeight(),
+                color = MaidyBorderLight
             )
             
             BasicTextField(
@@ -75,7 +82,7 @@ fun PhoneNumberField(
                 onValueChange = onPhoneNumberChange,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 12.dp),
+                    .padding(horizontal = 16.dp),
                 textStyle = TextStyle(
                     fontSize = 14.sp,
                     color = MaidyTextPrimary

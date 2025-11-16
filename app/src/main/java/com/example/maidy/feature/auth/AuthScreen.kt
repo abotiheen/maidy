@@ -37,7 +37,7 @@ fun AuthScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 24.dp)
+                        .padding(horizontal = 16.dp)
                         .padding(top = 48.dp)
                 ) {
                     // Tab Row
@@ -170,7 +170,7 @@ private fun AuthScreenContent(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 24.dp)
+                        .padding(horizontal = 16.dp)
                         .padding(top = 48.dp)
                 ) {
                     // Tab Row

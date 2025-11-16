@@ -27,7 +27,7 @@ fun RegisterScreen(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(24.dp),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(32.dp))
