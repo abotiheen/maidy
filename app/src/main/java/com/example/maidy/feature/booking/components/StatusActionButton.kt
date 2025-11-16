@@ -1,0 +1,162 @@
+package com.example.maidy.feature.booking.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.maidy.feature.booking.BookingStatus
+import com.example.maidy.ui.theme.*
+
+@Composable
+fun StatusActionButton(
+    currentStatus: BookingStatus,
+    onCancelOrder: () -> Unit,
+    onContactMaid: () -> Unit,
+    onSOSClicked: () -> Unit,
+    onRateMaid: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    when (currentStatus) {
+        BookingStatus.CONFIRMED -> {
+            ActionButton(
+                text = "Cancel Order",
+                icon = Icons.Default.Close,
+                backgroundColor = BookingStatusCancelButton,
+                textColor = BookingStatusCancelButtonText,
+                onClick = onCancelOrder,
+                modifier = modifier
+            )
+        }
+        BookingStatus.ON_THE_WAY -> {
+            ActionButton(
+                text = "Contact Jane",
+                icon = Icons.Default.Call,
+                backgroundColor = BookingStatusContactButton,
+                textColor = BookingStatusContactButtonText,
+                onClick = onContactMaid,
+                modifier = modifier
+            )
+        }
+        BookingStatus.IN_PROGRESS -> {
+            ActionButton(
+                text = "SOS Emergency",
+                icon = Icons.Default.Warning,
+                backgroundColor = BookingStatusSOSButton,
+                textColor = BookingStatusSOSButtonText,
+                onClick = onSOSClicked,
+                modifier = modifier
+            )
+        }
+        BookingStatus.COMPLETED -> {
+            ActionButton(
+                text = "Rate the Maid",
+                icon = Icons.Default.Star,
+                backgroundColor = BookingStatusRateButton,
+                textColor = BookingStatusRateButtonText,
+                onClick = onRateMaid,
+                modifier = modifier
+            )
+        }
+    }
+}
+
+@Composable
+private fun ActionButton(
+    text: String,
+    icon: ImageVector,
+    backgroundColor: Color,
+    textColor: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = backgroundColor
+        )
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = text,
+            tint = textColor,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = text,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = textColor
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun StatusActionButtonPreview() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(BookingStatusBackground)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text("Confirmed Status", fontWeight = FontWeight.Bold)
+        StatusActionButton(
+            currentStatus = BookingStatus.CONFIRMED,
+            onCancelOrder = {},
+            onContactMaid = {},
+            onSOSClicked = {},
+            onRateMaid = {}
+        )
+        
+        Text("On the Way Status", fontWeight = FontWeight.Bold)
+        StatusActionButton(
+            currentStatus = BookingStatus.ON_THE_WAY,
+            onCancelOrder = {},
+            onContactMaid = {},
+            onSOSClicked = {},
+            onRateMaid = {}
+        )
+        
+        Text("In Progress Status", fontWeight = FontWeight.Bold)
+        StatusActionButton(
+            currentStatus = BookingStatus.IN_PROGRESS,
+            onCancelOrder = {},
+            onContactMaid = {},
+            onSOSClicked = {},
+            onRateMaid = {}
+        )
+        
+        Text("Completed Status", fontWeight = FontWeight.Bold)
+        StatusActionButton(
+            currentStatus = BookingStatus.COMPLETED,
+            onCancelOrder = {},
+            onContactMaid = {},
+            onSOSClicked = {},
+            onRateMaid = {}
+        )
+    }
+}
+
