@@ -39,7 +39,7 @@ fun OtpVerificationScreen(
         
         // Instruction Text
         Text(
-            text = "Enter 4-digit code sent to your phone",
+            text = "Enter 6-digit code sent to ${uiState.phoneNumber}",
             fontSize = 16.sp,
             color = MaidyTextPrimary,
             fontWeight = FontWeight.Medium,
@@ -83,8 +83,8 @@ fun OtpVerificationScreen(
         
         // Confirm Button
         PrimaryButton(
-            text = "Confirm",
-            onClick = { onEvent(AuthEvent.ConfirmOtpClicked) },
+            text = "Verify Code",
+            onClick = { onEvent(AuthEvent.VerifyOtpClicked) },
             isLoading = uiState.isLoading
         )
         

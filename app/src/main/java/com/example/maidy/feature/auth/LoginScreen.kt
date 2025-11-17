@@ -1,11 +1,13 @@
 package com.example.maidy.feature.auth
 
+import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -19,6 +21,8 @@ fun LoginScreen(
     onEvent: (AuthEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val activity = context as? Activity
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -44,37 +48,15 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth()
         )
         
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(32.dp))
         
-        // Password Field
-        AuthTextField(
-            value = uiState.password,
-            onValueChange = { onEvent(AuthEvent.PasswordChanged(it)) },
-            label = "Password",
-            placeholder = "Enter your password",
-            isPassword = true,
-            passwordVisible = uiState.passwordVisible,
-            onPasswordVisibilityToggle = { onEvent(AuthEvent.TogglePasswordVisibility) },
-            modifier = Modifier.fillMaxWidth()
+        // Info text
+        Text(
+            text = "We'll send you a verification code via SMS",
+            fontSize = 14.sp,
+            color = MaidyTextSecondary,
+            modifier = Modifier.padding(bottom = 16.dp)
         )
-        
-        Spacer(modifier = Modifier.height(12.dp))
-        
-        // Forgot Password
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Text(
-                text = "Forgot Password?",
-                fontSize = 14.sp,
-                color = MaidyBlue,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.clickable { 
-                    onEvent(AuthEvent.ForgotPasswordClicked) 
-                }
-            )
-        }
         
         Spacer(modifier = Modifier.weight(1f))
         
@@ -88,10 +70,12 @@ fun LoginScreen(
             )
         }
         
-        // Login Button
+        // Send OTP Button
         PrimaryButton(
-            text = "Login",
-            onClick = { onEvent(AuthEvent.LoginClicked) },
+            text = "Send Code",
+            onClick = { 
+                activity?.let { onEvent(AuthEvent.SendOtpClicked(it)) }
+            },
             isLoading = uiState.isLoading
         )
         
@@ -110,9 +94,7 @@ private fun LoginScreenPreview() {
     MaidyTheme {
         LoginScreen(
             uiState = AuthUiState(
-                phoneNumber = "",
-                password = "",
-                passwordVisible = false
+                phoneNumber = ""
             ),
             onEvent = {}
         )
@@ -125,9 +107,7 @@ private fun LoginScreenFilledPreview() {
     MaidyTheme {
         LoginScreen(
             uiState = AuthUiState(
-                phoneNumber = "770 123 4567",
-                password = "password123",
-                passwordVisible = false
+                phoneNumber = "770 123 4567"
             ),
             onEvent = {}
         )
@@ -141,7 +121,6 @@ private fun LoginScreenLoadingPreview() {
         LoginScreen(
             uiState = AuthUiState(
                 phoneNumber = "770 123 4567",
-                password = "password123",
                 isLoading = true
             ),
             onEvent = {}

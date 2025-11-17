@@ -1,5 +1,6 @@
 package com.example.maidy.feature.auth
 
+import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,6 +25,8 @@ fun RegisterScreen(
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val activity = context as? Activity
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -61,21 +65,15 @@ fun RegisterScreen(
             modifier = Modifier.fillMaxWidth()
         )
         
-        Spacer(modifier = Modifier.height(20.dp))
-        
-        // Password Field
-        AuthTextField(
-            value = uiState.password,
-            onValueChange = { onEvent(AuthEvent.PasswordChanged(it)) },
-            label = "Password",
-            placeholder = "Enter your password",
-            isPassword = true,
-            passwordVisible = uiState.passwordVisible,
-            onPasswordVisibilityToggle = { onEvent(AuthEvent.TogglePasswordVisibility) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        
         Spacer(modifier = Modifier.height(32.dp))
+        
+        // Info text
+        Text(
+            text = "We'll send you a verification code via SMS",
+            fontSize = 14.sp,
+            color = MaidyTextSecondary,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
         
         // Error Message
         if (uiState.errorMessage != null) {
@@ -87,10 +85,12 @@ fun RegisterScreen(
             )
         }
         
-        // Create Account Button
+        // Send OTP Button
         PrimaryButton(
-            text = "Create Account",
-            onClick = { onEvent(AuthEvent.RegisterClicked) },
+            text = "Send Code",
+            onClick = { 
+                activity?.let { onEvent(AuthEvent.SendOtpClicked(it)) }
+            },
             isLoading = uiState.isLoading
         )
         
@@ -130,8 +130,7 @@ private fun RegisterScreenPreview() {
         RegisterScreen(
             uiState = AuthUiState(
                 fullName = "",
-                phoneNumber = "",
-                password = ""
+                phoneNumber = ""
             ),
             onEvent = {},
             onNavigateToLogin = {}
@@ -146,8 +145,7 @@ private fun RegisterScreenFilledPreview() {
         RegisterScreen(
             uiState = AuthUiState(
                 fullName = "John Doe",
-                phoneNumber = "770 123 4567",
-                password = "password123"
+                phoneNumber = "770 123 4567"
             ),
             onEvent = {},
             onNavigateToLogin = {}
@@ -163,7 +161,6 @@ private fun RegisterScreenLoadingPreview() {
             uiState = AuthUiState(
                 fullName = "John Doe",
                 phoneNumber = "770 123 4567",
-                password = "password123",
                 isLoading = true
             ),
             onEvent = {},

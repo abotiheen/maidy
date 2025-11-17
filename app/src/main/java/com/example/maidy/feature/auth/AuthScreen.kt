@@ -119,7 +119,6 @@ private fun AuthScreenLoginPreview() {
             uiState = AuthUiState(
                 currentScreen = AuthScreen.LOGIN,
                 phoneNumber = "",
-                password = ""
             ),
             onEvent = {}
         )
@@ -135,7 +134,6 @@ private fun AuthScreenRegisterPreview() {
                 currentScreen = AuthScreen.REGISTER,
                 fullName = "",
                 phoneNumber = "",
-                password = "",
             ),
             onEvent = {}
         )
