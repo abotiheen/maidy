@@ -13,10 +13,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.maidy.feature.auth.components.AuthTabRow
 import com.example.maidy.ui.theme.MaidyTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun AuthScreen(
-    viewModel: AuthViewModel = viewModel(),
+    viewModel: AuthViewModel = koinViewModel(),
     onAuthSuccess: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()

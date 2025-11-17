@@ -2,6 +2,8 @@ package com.example.maidy.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.maidy.core.data.UserRepository
+import com.example.maidy.core.model.User
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,7 +46,9 @@ sealed class AuthEvent {
     object ClearError : AuthEvent()
 }
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(
+    private val userRepository: UserRepository
+) : ViewModel() {
     
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
@@ -132,16 +136,52 @@ class AuthViewModel : ViewModel() {
                 return@launch
             }
             
-            // Simulate API call
+            // Show loading
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            delay(1500)
             
-            // Placeholder: Navigate to OTP screen
-            _uiState.update { 
-                it.copy(
-                    isLoading = false,
-                    currentScreen = AuthScreen.OTP_VERIFICATION
-                )
+            // Check if phone number already exists
+            val phoneExists = userRepository.isPhoneNumberTaken(_uiState.value.phoneNumber)
+            if (phoneExists) {
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Phone number already registered"
+                    )
+                }
+                return@launch
+            }
+            
+            // Create user object
+            val newUser = User(
+                fullName = _uiState.value.fullName,
+                phoneNumber = _uiState.value.phoneNumber,
+                password = _uiState.value.password,  // WARNING: Not secure! For learning only
+                createdAt = System.currentTimeMillis(),
+                role = "customer"
+            )
+            
+            // Save to Firebase
+            val result = userRepository.createUser(newUser)
+            
+            result.onSuccess { userId ->
+                // Success!
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        isRegistrationSuccessful = true,
+                        errorMessage = "Account created! User ID: $userId"
+                    )
+                }
+                println("✅ User registered successfully with ID: $userId")
+            }.onFailure { error ->
+                // Failed
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Registration failed: ${error.message}"
+                    )
+                }
+                println("❌ Registration failed: ${error.message}")
             }
         }
     }
