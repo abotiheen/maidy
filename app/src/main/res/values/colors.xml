@@ -7,4 +7,30 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- Maid Profile Screen Colors -->
+    <color name="maid_profile_background">#FFF8F9FB</color>
+    <color name="maid_profile_name_text">#FF1F2937</color>
+    <color name="maid_profile_rating_text">#FF1F2937</color>
+    <color name="maid_profile_star_icon">#FFFBBF24</color>
+    <color name="maid_profile_review_count">#FF9CA3AF</color>
+    <color name="maid_profile_tab_selected">#FF5A8B8A</color>
+    <color name="maid_profile_tab_unselected">#FF6B7280</color>
+    <color name="maid_profile_tab_indicator">#FF5A8B8A</color>
+    <color name="maid_profile_content_background">#FFFFFFFF</color>
+    <color name="maid_profile_about_text">#FF4B5563</color>
+    <color name="maid_profile_section_title">#FF1F2937</color>
+    <color name="maid_profile_service_icon">#FF5A8B8A</color>
+    <color name="maid_profile_service_text">#FF1F2937</color>
+    <color name="maid_profile_service_background">#FFF3F4F6</color>
+    <color name="maid_profile_reviewer_name">#FF1F2937</color>
+    <color name="maid_profile_review_date">#FF9CA3AF</color>
+    <color name="maid_profile_review_text">#FF4B5563</color>
+    <color name="maid_profile_review_star">#FFFBBF24</color>
+    <color name="maid_profile_price_label">#FF6B7280</color>
+    <color name="maid_profile_price_value">#FF1F2937</color>
+    <color name="maid_profile_book_button">#FF5A8B8A</color>
+    <color name="maid_profile_book_button_text">#FFFFFFFF</color>
+    <color name="maid_profile_bottom_bar_background">#FFFFFFFF</color>
+    <color name="maid_profile_verification_badge">#FF3B82F6</color>
 </resources>
