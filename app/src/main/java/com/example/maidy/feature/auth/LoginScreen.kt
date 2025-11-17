@@ -48,14 +48,18 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth()
         )
         
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         
-        // Info text
-        Text(
-            text = "We'll send you a verification code via SMS",
-            fontSize = 14.sp,
-            color = MaidyTextSecondary,
-            modifier = Modifier.padding(bottom = 16.dp)
+        // Password Field
+        AuthTextField(
+            value = uiState.password,
+            onValueChange = { onEvent(AuthEvent.PasswordChanged(it)) },
+            label = "Password",
+            placeholder = "Enter your password",
+            isPassword = true,
+            passwordVisible = uiState.passwordVisible,
+            onPasswordVisibilityToggle = { onEvent(AuthEvent.TogglePasswordVisibility) },
+            modifier = Modifier.fillMaxWidth()
         )
         
         Spacer(modifier = Modifier.weight(1f))
@@ -70,12 +74,10 @@ fun LoginScreen(
             )
         }
         
-        // Send OTP Button
+        // Login Button
         PrimaryButton(
-            text = "Send Code",
-            onClick = { 
-                activity?.let { onEvent(AuthEvent.SendOtpClicked(it)) }
-            },
+            text = "Login",
+            onClick = { onEvent(AuthEvent.LoginClicked) },
             isLoading = uiState.isLoading
         )
         

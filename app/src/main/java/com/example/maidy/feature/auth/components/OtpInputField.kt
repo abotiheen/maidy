@@ -9,19 +9,25 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.maidy.ui.theme.*
 
 /**
- * 4-digit OTP input field with separate boxes for each digit
+ * 6-digit OTP input field with separate boxes for each digit
  * 
- * @param otpValue Current OTP value (0-4 digits)
+ * @param otpValue Current OTP value (0-6 digits)
  * @param onOtpChange Callback when OTP changes
  * @param modifier Modifier to be applied to the field container
  */
@@ -31,27 +37,52 @@ fun OtpInputField(
     onOtpChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
-    ) {
-        repeat(4) { index ->
-            val digit = otpValue.getOrNull(index)?.toString() ?: ""
-            OtpDigitBox(
-                digit = digit,
-                isFocused = otpValue.length == index,
-                onClick = { /* Handle click */ }
-            )
-        }
-    }
+    val focusRequester = remember { FocusRequester() }
     
-    // Hidden text field for input
-    BasicTextField(
-        value = otpValue,
-        onValueChange = { if (it.length <= 4 && it.all { char -> char.isDigit() }) onOtpChange(it) },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-        modifier = Modifier.size(0.dp)
-    )
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        // Visible boxes
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+        ) {
+            repeat(6) { index ->
+                val digit = otpValue.getOrNull(index)?.toString() ?: ""
+                OtpDigitBox(
+                    digit = digit,
+                    isFocused = otpValue.length == index,
+                    onClick = {
+                        focusRequester.requestFocus()
+                    }
+                )
+            }
+        }
+        
+        // Hidden text field for actual input
+        BasicTextField(
+            value = otpValue,
+            onValueChange = { 
+                if (it.length <= 6 && it.all { char -> char.isDigit() }) {
+                    onOtpChange(it)
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
+            textStyle = TextStyle(
+                color = Color.Transparent,
+                fontSize = 1.sp
+            ),
+            decorationBox = { innerTextField ->
+                // Empty decoration box - we're using the visual boxes above
+                Box(modifier = Modifier.size(0.dp)) {
+                    innerTextField()
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -62,7 +93,7 @@ private fun OtpDigitBox(
 ) {
     Box(
         modifier = Modifier
-            .size(64.dp)
+            .size(48.dp)
             .border(
                 width = if (isFocused) 2.dp else 1.dp,
                 color = if (isFocused) MaidyBorderFocused else MaidyBorderLight,
@@ -76,7 +107,8 @@ private fun OtpDigitBox(
             text = digit,
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
-            color = MaidyTextPrimary
+            color = MaidyTextPrimary,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -139,7 +171,7 @@ private fun OtpInputFieldCompletePreview() {
     MaidyTheme {
         Column(Modifier.padding(16.dp)) {
             OtpInputField(
-                otpValue = "1234",
+                otpValue = "123456",
                 onOtpChange = {}
             )
         }

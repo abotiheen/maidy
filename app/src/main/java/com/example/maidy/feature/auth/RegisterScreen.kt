@@ -65,11 +65,25 @@ fun RegisterScreen(
             modifier = Modifier.fillMaxWidth()
         )
         
+        Spacer(modifier = Modifier.height(20.dp))
+        
+        // Password Field
+        AuthTextField(
+            value = uiState.password,
+            onValueChange = { onEvent(AuthEvent.PasswordChanged(it)) },
+            label = "Password",
+            placeholder = "Create a password (min 6 characters)",
+            isPassword = true,
+            passwordVisible = uiState.passwordVisible,
+            onPasswordVisibilityToggle = { onEvent(AuthEvent.TogglePasswordVisibility) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        
         Spacer(modifier = Modifier.height(32.dp))
         
         // Info text
         Text(
-            text = "We'll send you a verification code via SMS",
+            text = "We'll send you a verification code to verify your phone",
             fontSize = 14.sp,
             color = MaidyTextSecondary,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -85,11 +99,11 @@ fun RegisterScreen(
             )
         }
         
-        // Send OTP Button
+        // Register Button - sends OTP
         PrimaryButton(
-            text = "Send Code",
+            text = "Register",
             onClick = { 
-                activity?.let { onEvent(AuthEvent.SendOtpClicked(it)) }
+                activity?.let { onEvent(AuthEvent.SendOtpForRegistration(it)) }
             },
             isLoading = uiState.isLoading
         )

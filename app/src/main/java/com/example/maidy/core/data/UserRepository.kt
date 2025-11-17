@@ -39,4 +39,34 @@ class UserRepository(
             Result.failure(e)
         }
     }
+    
+    // Login with phone and password (no OTP)
+    suspend fun loginWithPassword(phoneNumber: String, password: String): Result<User> {
+        return try {
+            val querySnapshot = firestore.collection("users")
+                .whereEqualTo("phoneNumber", phoneNumber)
+                .limit(1)
+                .get()
+                .await()
+            
+            if (querySnapshot.isEmpty) {
+                return Result.failure(Exception("User not found"))
+            }
+            
+            val user = querySnapshot.documents[0].toObject(User::class.java)
+            
+            if (user == null) {
+                return Result.failure(Exception("Invalid user data"))
+            }
+            
+            // Verify password
+            if (user.password != password) {
+                return Result.failure(Exception("Incorrect password"))
+            }
+            
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

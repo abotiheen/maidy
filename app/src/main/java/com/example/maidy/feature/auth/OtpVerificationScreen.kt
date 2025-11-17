@@ -129,7 +129,7 @@ private fun OtpVerificationScreenFilledPreview() {
     MaidyTheme {
         OtpVerificationScreen(
             uiState = AuthUiState(
-                otpCode = "1234"
+                otpCode = "123456"
             ),
             onEvent = {}
         )
@@ -142,7 +142,7 @@ private fun OtpVerificationScreenLoadingPreview() {
     MaidyTheme {
         OtpVerificationScreen(
             uiState = AuthUiState(
-                otpCode = "1234",
+                otpCode = "123456",
                 isLoading = true
             ),
             onEvent = {}
@@ -156,7 +156,7 @@ private fun OtpVerificationScreenErrorPreview() {
     MaidyTheme {
         OtpVerificationScreen(
             uiState = AuthUiState(
-                otpCode = "1234",
+                otpCode = "123456",
                 errorMessage = "Invalid code. Please try again."
             ),
             onEvent = {}
@@ -170,7 +170,7 @@ private fun OtpVerificationScreenSuccessPreview() {
     MaidyTheme {
         OtpVerificationScreen(
             uiState = AuthUiState(
-                otpCode = "1234",
+                otpCode = "123456",
                 errorMessage = "Code resent successfully"
             ),
             onEvent = {}

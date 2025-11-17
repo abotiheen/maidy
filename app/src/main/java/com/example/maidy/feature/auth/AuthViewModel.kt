@@ -19,6 +19,8 @@ import kotlinx.coroutines.launch
 data class AuthUiState(
     val isLoading: Boolean = false,
     val phoneNumber: String = "",
+    val password: String = "",
+    val passwordVisible: Boolean = false,
     val fullName: String = "",
     val otpCode: String = "",
     val errorMessage: String? = null,
@@ -35,9 +37,12 @@ enum class AuthScreen {
 // UI Events
 sealed class AuthEvent {
     data class PhoneNumberChanged(val phone: String) : AuthEvent()
+    data class PasswordChanged(val password: String) : AuthEvent()
     data class FullNameChanged(val name: String) : AuthEvent()
     data class OtpCodeChanged(val code: String) : AuthEvent()
-    data class SendOtpClicked(val activity: Activity) : AuthEvent()
+    object TogglePasswordVisibility : AuthEvent()
+    object LoginClicked : AuthEvent()
+    data class SendOtpForRegistration(val activity: Activity) : AuthEvent()
     object VerifyOtpClicked : AuthEvent()
     object ResendCodeClicked : AuthEvent()
     data class NavigateToScreen(val screen: AuthScreen) : AuthEvent()
@@ -61,14 +66,23 @@ class AuthViewModel(
             is AuthEvent.PhoneNumberChanged -> {
                 _uiState.update { it.copy(phoneNumber = event.phone) }
             }
+            is AuthEvent.PasswordChanged -> {
+                _uiState.update { it.copy(password = event.password) }
+            }
             is AuthEvent.FullNameChanged -> {
                 _uiState.update { it.copy(fullName = event.name) }
             }
             is AuthEvent.OtpCodeChanged -> {
                 _uiState.update { it.copy(otpCode = event.code) }
             }
-            is AuthEvent.SendOtpClicked -> {
-                sendOtp(event.activity)
+            AuthEvent.TogglePasswordVisibility -> {
+                _uiState.update { it.copy(passwordVisible = !it.passwordVisible) }
+            }
+            AuthEvent.LoginClicked -> {
+                performLogin()
+            }
+            is AuthEvent.SendOtpForRegistration -> {
+                sendOtpForRegistration(event.activity)
             }
             AuthEvent.VerifyOtpClicked -> {
                 verifyOtp()
@@ -85,31 +99,89 @@ class AuthViewModel(
         }
     }
     
-    private fun sendOtp(activity: Activity) {
+    // Login with phone + password (NO OTP)
+    private fun performLogin() {
         viewModelScope.launch {
-            val phoneNumber = _uiState.value.phoneNumber.trim()
-            
-            // Validate phone number
-            if (phoneNumber.isEmpty()) {
+            // Validate inputs
+            if (_uiState.value.phoneNumber.isEmpty()) {
                 _uiState.update { it.copy(errorMessage = "Please enter phone number") }
                 return@launch
             }
-            
-            // Format phone number (add +1 if not present)
-            val formattedPhone = if (!phoneNumber.startsWith("+")) {
-                "+964$phoneNumber"
-            } else {
-                phoneNumber
-            }
-            
-            // For registration, validate name
-            if (_uiState.value.currentScreen == AuthScreen.REGISTER && _uiState.value.fullName.isEmpty()) {
-                _uiState.update { it.copy(errorMessage = "Please enter your full name") }
+            if (_uiState.value.password.isEmpty()) {
+                _uiState.update { it.copy(errorMessage = "Please enter password") }
                 return@launch
             }
             
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             
+            // Format phone number
+            val formattedPhone = if (!_uiState.value.phoneNumber.startsWith("+")) {
+                "+1${_uiState.value.phoneNumber}"
+            } else {
+                _uiState.value.phoneNumber
+            }
+            
+            // Query Firestore for user with phone + password
+            val result = userRepository.loginWithPassword(
+                phoneNumber = formattedPhone,
+                password = _uiState.value.password
+            )
+            
+            result.onSuccess { user ->
+                // Save session
+                sessionManager.saveUserId(user.id)
+                
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        isLoginSuccessful = true,
+                        errorMessage = null
+                    )
+                }
+                println("✅ Login successful! User: ${user.fullName}")
+            }.onFailure { error ->
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = error.message ?: "Login failed"
+                    )
+                }
+                println("❌ Login failed: ${error.message}")
+            }
+        }
+    }
+    
+    // Registration: Send OTP to verify phone number
+    private fun sendOtpForRegistration(activity: Activity) {
+        viewModelScope.launch {
+            // Validate all fields including password
+            if (_uiState.value.fullName.isEmpty()) {
+                _uiState.update { it.copy(errorMessage = "Please enter your full name") }
+                return@launch
+            }
+            if (_uiState.value.phoneNumber.isEmpty()) {
+                _uiState.update { it.copy(errorMessage = "Please enter phone number") }
+                return@launch
+            }
+            if (_uiState.value.password.isEmpty()) {
+                _uiState.update { it.copy(errorMessage = "Please enter password") }
+                return@launch
+            }
+            if (_uiState.value.password.length < 6) {
+                _uiState.update { it.copy(errorMessage = "Password must be at least 6 characters") }
+                return@launch
+            }
+            
+            // Format phone number
+            val formattedPhone = if (!_uiState.value.phoneNumber.startsWith("+")) {
+                "+964${_uiState.value.phoneNumber}"
+            } else {
+                _uiState.value.phoneNumber
+            }
+            
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            
+            // Send OTP to verify phone
             authRepository.sendOtp(formattedPhone, activity).collect { state ->
                 when (state) {
                     is OtpState.CodeSent -> {
@@ -142,6 +214,7 @@ class AuthViewModel(
         }
     }
     
+    // Verify OTP code during registration
     private fun verifyOtp() {
         viewModelScope.launch {
             val otpCode = _uiState.value.otpCode.trim()
@@ -162,7 +235,7 @@ class AuthViewModel(
             val result = authRepository.verifyOtp(verificationId, otpCode)
             
             result.onSuccess { userId ->
-                handleAuthSuccess(userId)
+                handleRegistrationSuccess(userId)
             }.onFailure { error ->
                 _uiState.update { 
                     it.copy(
@@ -179,7 +252,7 @@ class AuthViewModel(
         viewModelScope.launch {
             val result = authRepository.signInWithCredential(credential)
             result.onSuccess { userId ->
-                handleAuthSuccess(userId)
+                handleRegistrationSuccess(userId)
             }.onFailure { error ->
                 _uiState.update { 
                     it.copy(
@@ -191,27 +264,23 @@ class AuthViewModel(
         }
     }
     
-    private suspend fun handleAuthSuccess(userId: String) {
+    // After OTP verified, create user profile with password
+    private suspend fun handleRegistrationSuccess(userId: String) {
         // Save user ID to session
         sessionManager.saveUserId(userId)
         
-        // Check if user profile exists
-        val userResult = userRepository.getUserById(userId)
+        // Create user profile with password
+        val newUser = User(
+            id = userId,
+            fullName = _uiState.value.fullName,
+            phoneNumber = _uiState.value.phoneNumber,
+            password = _uiState.value.password,  // Store password
+            phoneVerified = true,  // Mark phone as verified with OTP
+            createdAt = System.currentTimeMillis(),
+            role = "customer"
+        )
         
-        if (userResult.isFailure) {
-            // New user - create profile
-            val newUser = User(
-                id = userId,
-                fullName = _uiState.value.fullName,
-                phoneNumber = _uiState.value.phoneNumber,
-                createdAt = System.currentTimeMillis(),
-                role = "customer"
-            )
-            userRepository.createUserProfile(userId, newUser)
-            println("✅ New user profile created")
-        } else {
-            println("✅ Existing user logged in")
-        }
+        userRepository.createUserProfile(userId, newUser)
         
         _uiState.update { 
             it.copy(
@@ -220,6 +289,6 @@ class AuthViewModel(
                 errorMessage = null
             )
         }
-        println("✅ Authentication successful! User ID: $userId")
+        println("✅ Registration successful! User ID: $userId, Name: ${newUser.fullName}")
     }
 }
