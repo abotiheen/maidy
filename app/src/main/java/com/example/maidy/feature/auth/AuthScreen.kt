@@ -24,8 +24,8 @@ fun AuthScreen(
     var selectedTab by remember { mutableStateOf(0) }
     
     // Handle successful authentication
-    LaunchedEffect(uiState.isOtpVerified) {
-        if (uiState.isOtpVerified) {
+    LaunchedEffect(uiState.isLoginSuccessful, uiState.isOtpVerified) {
+        if (uiState.isLoginSuccessful || uiState.isOtpVerified) {
             onAuthSuccess()
         }
     }

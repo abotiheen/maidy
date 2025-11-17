@@ -2,6 +2,7 @@ package com.example.maidy.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.maidy.core.data.SessionManager
 import com.example.maidy.core.data.UserRepository
 import com.example.maidy.core.model.User
 import kotlinx.coroutines.delay
@@ -47,7 +48,8 @@ sealed class AuthEvent {
 }
 
 class AuthViewModel(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -106,16 +108,37 @@ class AuthViewModel(
                 return@launch
             }
             
-            // Simulate API call
+            // Show loading
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            delay(1500)
             
-            // Placeholder: Navigate to OTP screen
-            _uiState.update { 
-                it.copy(
-                    isLoading = false,
-                    currentScreen = AuthScreen.OTP_VERIFICATION
-                )
+            // Attempt login
+            val result = userRepository.loginUser(
+                phoneNumber = _uiState.value.phoneNumber,
+                password = _uiState.value.password
+            )
+            
+            result.onSuccess { user ->
+                // Save user ID to session
+                sessionManager.saveUserId(user.id)
+                
+                // Login successful
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        isLoginSuccessful = true,
+                        errorMessage = null
+                    )
+                }
+                println("✅ Login successful! User ID: ${user.id}, Name: ${user.fullName}")
+            }.onFailure { error ->
+                // Login failed
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = error.message ?: "Login failed"
+                    )
+                }
+                println("❌ Login failed: ${error.message}")
             }
         }
     }
