@@ -19,6 +19,7 @@ import com.example.maidy.ui.theme.*
 fun LoginScreen(
     uiState: AuthUiState,
     onEvent: (AuthEvent) -> Unit,
+    onNavigateToTerms: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -84,7 +85,9 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
         
         // Terms and Conditions
-        TermsAndConditionsText()
+        TermsAndConditionsText(
+            onTermsClick = onNavigateToTerms
+        )
         
         Spacer(modifier = Modifier.height(32.dp))
     }

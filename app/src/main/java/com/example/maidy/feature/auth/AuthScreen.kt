@@ -18,7 +18,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AuthScreen(
     viewModel: AuthViewModel = koinViewModel(),
-    onAuthSuccess: () -> Unit = {}
+    onAuthSuccess: () -> Unit = {},
+    onNavigateToTerms: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var selectedTab by remember { mutableStateOf(0) }
@@ -87,12 +88,14 @@ fun AuthScreen(
                             0 -> LoginScreen(
                                 uiState = uiState,
                                 onEvent = viewModel::onEvent,
+                                onNavigateToTerms = onNavigateToTerms,
                                 modifier = Modifier.fillMaxSize()
                             )
                             1 -> RegisterScreen(
                                 uiState = uiState,
                                 onEvent = viewModel::onEvent,
                                 onNavigateToLogin = { selectedTab = 0 },
+                                onNavigateToTerms = onNavigateToTerms,
                                 modifier = Modifier.fillMaxSize()
                             )
                         }
@@ -103,6 +106,7 @@ fun AuthScreen(
                 OtpVerificationScreen(
                     uiState = uiState,
                     onEvent = viewModel::onEvent,
+                    onNavigateToTerms = onNavigateToTerms,
                     modifier = Modifier.fillMaxSize()
                 )
             }

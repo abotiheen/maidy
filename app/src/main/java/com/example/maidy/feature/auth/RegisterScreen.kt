@@ -23,6 +23,7 @@ fun RegisterScreen(
     uiState: AuthUiState,
     onEvent: (AuthEvent) -> Unit,
     onNavigateToLogin: () -> Unit,
+    onNavigateToTerms: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -111,7 +112,9 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.height(16.dp))
         
         // Terms and Conditions
-        TermsAndConditionsText()
+        TermsAndConditionsText(
+            onTermsClick = onNavigateToTerms
+        )
         
         Spacer(modifier = Modifier.height(16.dp))
         

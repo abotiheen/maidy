@@ -116,7 +116,7 @@ class AuthViewModel(
             
             // Format phone number
             val formattedPhone = if (!_uiState.value.phoneNumber.startsWith("+")) {
-                "+1${_uiState.value.phoneNumber}"
+                "+964${_uiState.value.phoneNumber}"
             } else {
                 _uiState.value.phoneNumber
             }

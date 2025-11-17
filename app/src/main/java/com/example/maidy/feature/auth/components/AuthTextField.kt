@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -18,6 +19,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.maidy.R
 import com.example.maidy.ui.theme.*
 
 /**
@@ -79,8 +81,7 @@ fun AuthTextField(
                 {
                     IconButton(onClick = { onPasswordVisibilityToggle?.invoke() }) {
                         Icon(
-                            imageVector = if (passwordVisible) 
-                                Icons.Filled.Build else Icons.Filled.AccountBox,
+                            painter = painterResource(R.drawable.visibility),
                             contentDescription = if (passwordVisible) 
                                 "Hide password" else "Show password",
                             tint = MaidyTextSecondary
