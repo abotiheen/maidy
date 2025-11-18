@@ -1,10 +1,14 @@
 package com.example.maidy.feature.home
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.maidy.core.data.SessionManager
+import com.example.maidy.core.data.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class BookingItem(
     val id: String,
@@ -23,11 +27,13 @@ enum class BookingStatus {
 }
 
 data class HomeUiState(
-    val userName: String = "Sarah",
+    val userName: String = "",
     val searchQuery: String = "",
     val recentBookings: List<BookingItem> = emptyList(),
     val hasNotifications: Boolean = false,
-    val profileImageUrl: String = "" // Placeholder
+    val profileImageUrl: String = "",
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
 )
 
 sealed class HomeUiEvent {
@@ -38,11 +44,15 @@ sealed class HomeUiEvent {
     data class OnBookingClick(val bookingId: String) : HomeUiEvent()
 }
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(
+    private val userRepository: UserRepository,
+    private val sessionManager: SessionManager
+) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
+        loadUserData()
         loadPlaceholderData()
     }
 
@@ -65,12 +75,66 @@ class HomeViewModel : ViewModel() {
             }
         }
     }
+    
+    private fun loadUserData() {
+        viewModelScope.launch {
+            println("🟢 HomeViewModel: Loading user data...")
+            _uiState.update { it.copy(isLoading = true) }
+            
+            val userId = sessionManager.getCurrentUserId()
+            println("🟢 HomeViewModel: User ID = $userId")
+            
+            if (userId == null) {
+                println("❌ HomeViewModel: User not logged in, showing Guest")
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        userName = "Guest"
+                    )
+                }
+                return@launch
+            }
+            
+            try {
+                val result = userRepository.getUserById(userId)
+                
+                if (result.isSuccess) {
+                    val user = result.getOrNull()!!
+                    println("✅ HomeViewModel: User loaded - Name: ${user.fullName}, Image: ${user.profileImageUrl}")
+                    _uiState.update { 
+                        it.copy(
+                            userName = user.fullName,
+                            profileImageUrl = user.profileImageUrl,
+                            isLoading = false
+                        )
+                    }
+                } else {
+                    val error = result.exceptionOrNull()?.message
+                    println("❌ HomeViewModel: Failed to load user: $error")
+                    _uiState.update { 
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                println("❌ HomeViewModel: Exception loading user: ${e.message}")
+                e.printStackTrace()
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = e.message
+                    )
+                }
+            }
+        }
+    }
 
     private fun loadPlaceholderData() {
         // Placeholder data - will be replaced with API calls
         _uiState.update {
             it.copy(
-                userName = "Sarah",
                 hasNotifications = true,
                 recentBookings = listOf(
                     BookingItem(

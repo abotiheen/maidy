@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 // Extension property to create DataStore instance
@@ -34,13 +35,9 @@ class SessionManager(private val context: Context) {
     
     // Get current user ID (one-time)
     suspend fun getCurrentUserId(): String? {
-        var userId: String? = null
-        context.dataStore.data.map { preferences ->
+        return context.dataStore.data.map { preferences ->
             preferences[USER_ID_KEY]
-        }.collect {
-            userId = it
-        }
-        return userId
+        }.first()
     }
     
     // Check if user is logged in

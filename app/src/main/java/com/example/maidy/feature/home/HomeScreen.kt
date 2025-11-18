@@ -10,14 +10,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.maidy.feature.home.components.*
 import com.example.maidy.ui.theme.MaidyBackgroundWhite
 import com.example.maidy.ui.theme.MaidyTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = viewModel(),
+    viewModel: HomeViewModel = koinViewModel(),
     onNavigateToBooking: () -> Unit = {},
     onNavigateToSchedule: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},

@@ -17,11 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.maidy.feature.settings.components.*
 import com.example.maidy.ui.theme.ProfileScreenBackground
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Profile/Settings Screen
@@ -30,7 +30,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel = viewModel(),
+    viewModel: ProfileViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -96,6 +96,7 @@ private fun ProfileScreenContent(
             profileImageUri = uiState.profileImageUri,
             fullName = uiState.fullName,
             email = uiState.email,
+            isLoading = uiState.isLoading,
             onEditProfileImageClick = onEditProfileImageClick
         )
         
@@ -112,7 +113,7 @@ private fun ProfileScreenContent(
         // Phone Number Field
         ProfileInfoField(
             label = "Phone Number",
-            value = uiState.phoneNumber
+            value = "0${uiState.phoneNumber.substringAfter("4")}"
         )
         
         Spacer(modifier = Modifier.height(32.dp))

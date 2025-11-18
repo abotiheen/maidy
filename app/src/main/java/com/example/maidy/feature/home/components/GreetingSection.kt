@@ -16,8 +16,9 @@ fun GreetingSection(
     userName: String,
     modifier: Modifier = Modifier
 ) {
+    val displayName = userName.substringBefore(" ")
     Text(
-        text = "Hello, $userName!",
+        text = "Hello, $displayName!",
         fontSize = 36.sp,
         fontWeight = FontWeight.Bold,
         color = HomeGreetingText,

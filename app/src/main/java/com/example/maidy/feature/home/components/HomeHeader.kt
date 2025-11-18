@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
@@ -14,11 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.maidy.R
 import com.example.maidy.ui.theme.HomeNotificationBadge
 import com.example.maidy.ui.theme.MaidyTheme
@@ -42,10 +46,24 @@ fun HomeHeader(
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape)
-                .background(Color.LightGray)
+                .background(Color.LightGray),
+            contentAlignment = Alignment.Center
         ) {
-            // Placeholder for profile image
-            // TODO: Load actual image when API is connected
+            if (profileImageUrl.isNotEmpty()) {
+                AsyncImage(
+                    model = profileImageUrl,
+                    contentDescription = "Profile picture",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Profile Image",
+                    modifier = Modifier.size(32.dp),
+                    tint = Color.Gray
+                )
+            }
         }
 
         // Home Title

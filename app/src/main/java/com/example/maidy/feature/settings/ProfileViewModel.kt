@@ -1,7 +1,11 @@
 package com.example.maidy.feature.settings
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.maidy.core.data.SessionManager
+import com.example.maidy.core.data.UserRepository
+import com.example.maidy.core.util.ImageCompressor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +17,11 @@ import kotlinx.coroutines.launch
  * Manages user profile data and settings preferences
  * Follows unidirectional data flow pattern
  */
-class ProfileViewModel : ViewModel() {
+class ProfileViewModel(
+    private val userRepository: UserRepository,
+    private val sessionManager: SessionManager,
+    private val imageCompressor: ImageCompressor
+) : ViewModel() {
     
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
@@ -36,9 +44,78 @@ class ProfileViewModel : ViewModel() {
         }
     }
     
-    private fun updateProfileImage(uri: String) {
-        _uiState.update { it.copy(profileImageUri = uri) }
-        // TODO: Upload image to backend
+    private fun updateProfileImage(uriString: String) {
+        viewModelScope.launch {
+            println("🔵 ProfileViewModel: Starting image upload...")
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            
+            val userId = sessionManager.getCurrentUserId()
+            println("🔵 ProfileViewModel: User ID = $userId")
+            
+            if (userId == null) {
+                println("❌ ProfileViewModel: User not logged in!")
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false, 
+                        errorMessage = "User not logged in"
+                    )
+                }
+                return@launch
+            }
+            
+            try {
+                val originalUri = Uri.parse(uriString)
+                println("🔵 ProfileViewModel: Original image URI: $originalUri")
+                
+                // Compress image before upload
+                println("🔵 ProfileViewModel: Compressing image...")
+                val compressedUri = imageCompressor.compressImage(originalUri)
+                
+                if (compressedUri == null) {
+                    println("⚠️ ProfileViewModel: Compression failed, using original image")
+                    // Fall back to original if compression fails
+                    uploadImage(userId, originalUri)
+                } else {
+                    println("🔵 ProfileViewModel: Using compressed image")
+                    uploadImage(userId, compressedUri)
+                }
+                
+            } catch (e: Exception) {
+                println("❌ ProfileViewModel: Exception during upload: ${e.message}")
+                e.printStackTrace()
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = e.message ?: "Error uploading image"
+                    )
+                }
+            }
+        }
+    }
+    
+    private suspend fun uploadImage(userId: String, uri: Uri) {
+        println("🔵 ProfileViewModel: Uploading image from URI: $uri")
+        val result = userRepository.uploadAndUpdateProfileImage(userId, uri)
+        
+        if (result.isSuccess) {
+            val imageUrl = result.getOrNull()!!
+            println("✅ ProfileViewModel: Upload successful! URL: $imageUrl")
+            _uiState.update { 
+                it.copy(
+                    profileImageUri = imageUrl,
+                    isLoading = false
+                )
+            }
+        } else {
+            val error = result.exceptionOrNull()?.message ?: "Upload failed"
+            println("❌ ProfileViewModel: Upload failed: $error")
+            _uiState.update { 
+                it.copy(
+                    isLoading = false,
+                    errorMessage = error
+                )
+            }
+        }
     }
     
     private fun updateFullName(name: String) {
@@ -92,11 +169,51 @@ class ProfileViewModel : ViewModel() {
      */
     fun loadUserProfile() {
         viewModelScope.launch {
+            println("🔵 ProfileViewModel: Loading user profile...")
             _uiState.update { it.copy(isLoading = true) }
+            
+            val userId = sessionManager.getCurrentUserId()
+            println("🔵 ProfileViewModel: User ID = $userId")
+            
+            if (userId == null) {
+                println("❌ ProfileViewModel: User not logged in!")
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false, 
+                        errorMessage = "User not logged in"
+                    )
+                }
+                return@launch
+            }
+            
             try {
-                // TODO: Fetch user data from repository
-                _uiState.update { it.copy(isLoading = false) }
+                val result = userRepository.getUserById(userId)
+                
+                if (result.isSuccess) {
+                    val user = result.getOrNull()!!
+                    println("✅ ProfileViewModel: User loaded - Name: ${user.fullName}, Image: ${user.profileImageUrl}")
+                    _uiState.update { 
+                        it.copy(
+                            fullName = user.fullName,
+                            phoneNumber = user.phoneNumber,
+                            profileImageUri = user.profileImageUrl,
+                            email = user.phoneNumber, // Using phone as email for now
+                            isLoading = false
+                        )
+                    }
+                } else {
+                    val error = result.exceptionOrNull()?.message
+                    println("❌ ProfileViewModel: Failed to load user: $error")
+                    _uiState.update { 
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error
+                        )
+                    }
+                }
             } catch (e: Exception) {
+                println("❌ ProfileViewModel: Exception loading user: ${e.message}")
+                e.printStackTrace()
                 _uiState.update { 
                     it.copy(
                         isLoading = false,

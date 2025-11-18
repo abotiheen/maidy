@@ -87,6 +87,21 @@ class AuthRepository(
     
     // Sign out
     fun signOut() = auth.signOut()
+    
+    // Sign in anonymously (for password login to get auth token)
+    suspend fun signInAnonymously(): Result<String> {
+        return try {
+            println("🔑 AuthRepository: Signing in anonymously for auth token...")
+            val authResult = auth.signInAnonymously().await()
+            val userId = authResult.user?.uid ?: throw Exception("User ID not found")
+            println("🔑 AuthRepository: Anonymous sign-in successful! UID: $userId")
+            Result.success(userId)
+        } catch (e: Exception) {
+            println("❌ AuthRepository: Anonymous sign-in failed - ${e.message}")
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
 }
 
 // States for OTP flow

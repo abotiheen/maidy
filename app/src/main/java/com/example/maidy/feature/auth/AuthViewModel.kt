@@ -128,6 +128,10 @@ class AuthViewModel(
             )
             
             result.onSuccess { user ->
+                // Check if already signed in to Firebase Auth (from registration)
+                val currentFirebaseUser = authRepository.getCurrentUserId()
+                println("🔵 AuthViewModel: Password verified! Firebase Auth UID: $currentFirebaseUser")
+                
                 // Save session
                 sessionManager.saveUserId(user.id)
                 
@@ -138,7 +142,13 @@ class AuthViewModel(
                         errorMessage = null
                     )
                 }
-                println("✅ Login successful! User: ${user.fullName}")
+                
+                if (currentFirebaseUser == null) {
+                    println("⚠️ AuthViewModel: WARNING - Not signed into Firebase Auth! Storage uploads won't work.")
+                    println("⚠️ User needs to re-register to use image upload features.")
+                } else {
+                    println("✅ Login successful! User: ${user.fullName}, Firebase UID: $currentFirebaseUser")
+                }
             }.onFailure { error ->
                 _uiState.update { 
                     it.copy(

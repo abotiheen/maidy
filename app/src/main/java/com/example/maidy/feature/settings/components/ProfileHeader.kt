@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -14,10 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.maidy.ui.theme.*
 
 /**
@@ -29,6 +32,7 @@ fun ProfileHeader(
     fullName: String,
     email: String,
     onEditProfileImageClick: () -> Unit,
+    isLoading: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -52,13 +56,36 @@ fun ProfileHeader(
                     .clickable(onClick = onEditProfileImageClick),
                 contentAlignment = Alignment.Center
             ) {
-                // TODO: Load actual image if profileImageUri is not null
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Profile Image",
-                    modifier = Modifier.size(64.dp),
-                    tint = ProfileImagePlaceholderIcon
-                )
+                if (!profileImageUri.isNullOrEmpty()) {
+                    AsyncImage(
+                        model = profileImageUri,
+                        contentDescription = "Profile picture of $fullName",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Profile Image",
+                        modifier = Modifier.size(64.dp),
+                        tint = ProfileImagePlaceholderIcon
+                    )
+                }
+                
+                // Loading indicator overlay
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(ProfileImageBackground.copy(alpha = 0.7f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(48.dp),
+                            color = ProfileEditIconBackground
+                        )
+                    }
+                }
             }
             
             // Edit Icon Button
