@@ -42,7 +42,7 @@ import com.example.maidy.ui.theme.MaidyTextPrimary
 fun MaidyNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    startDestination: String = Screen.Auth.route
+    startDestination: String = Screen.Home.route
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -75,6 +75,22 @@ fun MaidyNavHost(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.White
                     )
+                )
+            }
+        },
+        bottomBar = {
+            if (currentScreen.showBottomBar) {
+                MaidyBottomBar(
+                    currentRoute = currentRoute,
+                    onNavigateToRoute = { route, currentRoute ->
+                        navController.navigate(route) {
+                            // Pop up to home screen and clear the back stack
+                            // This ensures home and profile don't stack on each other
+                            popUpTo(currentRoute) {
+                                inclusive = true
+                            }
+                        }
+                    }
                 )
             }
         },

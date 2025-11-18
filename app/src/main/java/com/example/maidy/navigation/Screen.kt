@@ -4,17 +4,22 @@ package com.example.maidy.navigation
  * Sealed class representing all navigation destinations in the app.
  * Each destination defines its route, screen title, and any required arguments.
  */
-sealed class Screen(val route: String, val title: String, val showTopBar: Boolean = true) {
+sealed class Screen(
+    val route: String, 
+    val title: String, 
+    val showTopBar: Boolean = true,
+    val showBottomBar: Boolean = false
+) {
     
     /**
      * Authentication screen (includes login, register, and OTP verification)
      */
-    data object Auth : Screen("auth", "Maidy", showTopBar = false)
+    data object Auth : Screen("auth", "Maidy", showTopBar = false, showBottomBar = false)
     
     /**
      * Home screen - main dashboard
      */
-    data object Home : Screen("home", "Home", showTopBar = true)
+    data object Home : Screen("home", "Home", showTopBar = false, showBottomBar = true)
     
     /**
      * Maid list screen - browse available maids
@@ -66,7 +71,7 @@ sealed class Screen(val route: String, val title: String, val showTopBar: Boolea
     /**
      * Settings screen - user preferences and app settings
      */
-    data object Settings : Screen("settings", "Profile")
+    data object Settings : Screen("settings", "Profile", showTopBar = false, showBottomBar = true)
     
     /**
      * Terms and Conditions screen - display app terms and conditions
