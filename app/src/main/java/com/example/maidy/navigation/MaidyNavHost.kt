@@ -22,6 +22,7 @@ import com.example.maidy.feature.booking.BookingStatusScreen
 import com.example.maidy.feature.home.HomeScreen
 import com.example.maidy.feature.maid_details.MaidProfileScreen
 import com.example.maidy.feature.maidlist.MaidListScreen
+import com.example.maidy.feature.settings.ProfileScreen
 import com.example.maidy.feature.sos.EmergencyScreen
 import com.example.maidy.feature.terms.TermsAndConditionsScreen
 import com.example.maidy.ui.theme.MaidListBackground
@@ -91,7 +92,9 @@ fun MaidyNavHost(
         composable(route = Screen.Auth.route) {
             AuthScreen(
                 onAuthSuccess = {
-                    navController.navigate(Screen.Home.route)
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Auth.route) { inclusive = true }
+                    }
                 },
                 onNavigateToTerms = {
                     navController.navigate(Screen.TermsAndConditions.route)
@@ -160,10 +163,8 @@ fun MaidyNavHost(
         }
         
         // Settings Screen - App Settings and Preferences
-        // TODO: Implement SettingsScreen
         composable(route = Screen.Settings.route) {
-            // Placeholder for future implementation
-            PlaceholderScreen(screenName = "Settings")
+            ProfileScreen()
         }
         
         // Terms and Conditions Screen

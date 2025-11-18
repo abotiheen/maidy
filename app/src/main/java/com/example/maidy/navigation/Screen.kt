@@ -65,9 +65,8 @@ sealed class Screen(val route: String, val title: String, val showTopBar: Boolea
     
     /**
      * Settings screen - user preferences and app settings
-     * (Screen not yet implemented, route reserved)
      */
-    data object Settings : Screen("settings", "Settings")
+    data object Settings : Screen("settings", "Profile")
     
     /**
      * Terms and Conditions screen - display app terms and conditions

@@ -29,7 +29,7 @@ val MaidyButtonDisabled = Color(0x804A8BF5) // 50% opacity
 // Tab & Toggle Colors
 val MaidyTabSelected = Color(0xFFFFFFFF)
 val MaidyTabUnselected = Color(0x00FFFFFF) // Transparent
-val MaidyTabBackground = Color(0xFFF5F7FA)
+val MaidyTabBackground = Color(0xFFf0f2f5)
 
 // Status Colors
 val MaidyErrorRed = Color(0xFFEF4444)
@@ -155,3 +155,28 @@ val MaidProfileBookButton = Color(0xFF5A8B8A)
 val MaidProfileBookButtonText = Color(0xFFFFFFFF)
 val MaidProfileBottomBarBackground = Color(0xFFFFFFFF)
 val MaidProfileVerificationBadge = Color(0xFF3B82F6)
+
+// Profile/Settings Screen Colors
+val ProfileScreenBackground = Color(0xFFF8F9FB)
+val ProfileHeaderBackground = Color(0xFFFFFFFF)
+val ProfileImageBackground = Color(0xFFEBD5BD)
+val ProfileImagePlaceholderIcon = Color(0xFF9E7E5C)
+val ProfileEditIconBackground = Color(0xFF4A8BF5)
+val ProfileEditIconTint = Color(0xFFFFFFFF)
+val ProfileNameText = Color(0xFF1F2937)
+val ProfileEmailText = Color(0xFF6B7280)
+val ProfileFieldLabel = Color(0xFF6B7280)
+val ProfileFieldBackground = Color(0xFFFFFFFF)
+val ProfileFieldValue = Color(0xFF1F2937)
+val ProfileSectionHeaderText = Color(0xFF1F2937)
+val ProfileSettingItemBackground = Color(0xFFFFFFFF)
+val ProfileSettingIconTint = Color(0xFF6B7280)
+val ProfileSettingTitleText = Color(0xFF1F2937)
+val ProfileSettingSubtitleText = Color(0xFF6B7280)
+val ProfileSettingChevronTint = Color(0xFF9CA3AF)
+val ProfileSwitchThumbChecked = Color(0xFFFFFFFF)
+val ProfileSwitchTrackChecked = Color(0xFF4A8BF5)
+val ProfileSwitchThumbUnchecked = Color(0xFFFFFFFF)
+val ProfileSwitchTrackUnchecked = Color(0xFFE5E7EB)
+val ProfileLogOutButtonBackground = Color(0xFFFCE7E7)
+val ProfileLogOutButtonText = Color(0xFFDC2626)

@@ -33,4 +33,29 @@
     <color name="maid_profile_book_button_text">#FFFFFFFF</color>
     <color name="maid_profile_bottom_bar_background">#FFFFFFFF</color>
     <color name="maid_profile_verification_badge">#FF3B82F6</color>
+    
+    <!-- Profile/Settings Screen Colors -->
+    <color name="profile_screen_background">#FFF8F9FB</color>
+    <color name="profile_header_background">#FFFFFFFF</color>
+    <color name="profile_image_background">#FFEBD5BD</color>
+    <color name="profile_image_placeholder_icon">#FF9E7E5C</color>
+    <color name="profile_edit_icon_background">#FF4A8BF5</color>
+    <color name="profile_edit_icon_tint">#FFFFFFFF</color>
+    <color name="profile_name_text">#FF1F2937</color>
+    <color name="profile_email_text">#FF6B7280</color>
+    <color name="profile_field_label">#FF6B7280</color>
+    <color name="profile_field_background">#FFFFFFFF</color>
+    <color name="profile_field_value">#FF1F2937</color>
+    <color name="profile_section_header_text">#FF1F2937</color>
+    <color name="profile_setting_item_background">#FFFFFFFF</color>
+    <color name="profile_setting_icon_tint">#FF6B7280</color>
+    <color name="profile_setting_title_text">#FF1F2937</color>
+    <color name="profile_setting_subtitle_text">#FF6B7280</color>
+    <color name="profile_setting_chevron_tint">#FF9CA3AF</color>
+    <color name="profile_switch_thumb_checked">#FFFFFFFF</color>
+    <color name="profile_switch_track_checked">#FF4A8BF5</color>
+    <color name="profile_switch_thumb_unchecked">#FFFFFFFF</color>
+    <color name="profile_switch_track_unchecked">#FFE5E7EB</color>
+    <color name="profile_logout_button_background">#FFFCE7E7</color>
+    <color name="profile_logout_button_text">#FFDC2626</color>
 </resources>
