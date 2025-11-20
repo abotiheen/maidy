@@ -39,7 +39,7 @@ fun HomeSearchBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground), // TODO: Replace with search icon
+            painter = painterResource(id = R.drawable.search), // TODO: Replace with search icon
             contentDescription = "Search",
             tint = HomeSearchIcon,
             modifier = Modifier.size(24.dp)
@@ -57,6 +57,7 @@ fun HomeSearchBar(
                     color = HomeSearchHint
                 )
             },
+            readOnly = true,
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
@@ -92,5 +93,6 @@ fun HomeSearchBarWithTextPreview() {
         )
     }
 }
+
 
 

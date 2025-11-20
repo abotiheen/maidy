@@ -40,7 +40,7 @@ fun ActionButtons(
             text = "Book Now",
             backgroundColor = HomeBookNowButton,
             textColor = Color.White,
-            iconRes = R.drawable.ic_launcher_foreground, // TODO: Replace with lightning/bolt icon
+            iconRes = R.drawable.book_maid, // TODO: Replace with lightning/bolt icon
             onClick = onBookNowClick,
             modifier = Modifier.weight(1f)
         )
@@ -50,7 +50,7 @@ fun ActionButtons(
             text = "Schedule",
             backgroundColor = HomeScheduleButton,
             textColor = HomeScheduleButtonText,
-            iconRes = R.drawable.ic_launcher_foreground, // TODO: Replace with calendar icon
+            iconRes = R.drawable.calendar, // TODO: Replace with calendar icon
             onClick = onScheduleClick,
             modifier = Modifier.weight(1f)
         )
@@ -89,14 +89,14 @@ private fun ActionButton(
                 painter = painterResource(id = iconRes),
                 contentDescription = text,
                 tint = textColor,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(28.dp)
             )
             
             Spacer(modifier = Modifier.width(8.dp))
             
             Text(
                 text = text,
-                fontSize = 16.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = textColor
             )
@@ -114,5 +114,6 @@ fun ActionButtonsPreview() {
         )
     }
 }
+
 
 

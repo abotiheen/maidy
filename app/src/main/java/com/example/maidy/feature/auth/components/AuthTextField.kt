@@ -81,7 +81,7 @@ fun AuthTextField(
                 {
                     IconButton(onClick = { onPasswordVisibilityToggle?.invoke() }) {
                         Icon(
-                            painter = painterResource(R.drawable.visibility),
+                            painter = if (passwordVisible) painterResource(R.drawable.visibilit_off) else painterResource(R.drawable.visibility) ,
                             contentDescription = if (passwordVisible) 
                                 "Hide password" else "Show password",
                             tint = MaidyTextSecondary
@@ -159,5 +159,6 @@ private fun AuthTextFieldPasswordVisiblePreview() {
         }
     }
 }
+
 
 
