@@ -21,7 +21,8 @@ fun HomeScreen(
     onNavigateToBooking: () -> Unit = {},
     onNavigateToSchedule: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
-    onNavigateToBookingDetails: (String) -> Unit = {}
+    onNavigateToBookingDetails: (String) -> Unit = {},
+    onNavigateToAdmin: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -31,7 +32,8 @@ fun HomeScreen(
         onNavigateToBooking = onNavigateToBooking,
         onNavigateToSchedule = onNavigateToSchedule,
         onNavigateToNotifications = onNavigateToNotifications,
-        onNavigateToBookingDetails = onNavigateToBookingDetails
+        onNavigateToBookingDetails = onNavigateToBookingDetails,
+        onNavigateToAdmin = onNavigateToAdmin
     )
 }
 
@@ -43,6 +45,7 @@ private fun HomeScreenContent(
     onNavigateToSchedule: () -> Unit,
     onNavigateToNotifications: () -> Unit,
     onNavigateToBookingDetails: (String) -> Unit,
+    onNavigateToAdmin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -58,7 +61,8 @@ private fun HomeScreenContent(
                 onNotificationClick = {
                     onEvent(HomeUiEvent.OnNotificationClick)
                     onNavigateToNotifications()
-                }
+                },
+                onAdminClick = onNavigateToAdmin
             )
         }
 
@@ -158,7 +162,8 @@ fun HomeScreenPreview() {
             onNavigateToBooking = {},
             onNavigateToSchedule = {},
             onNavigateToNotifications = {},
-            onNavigateToBookingDetails = {}
+            onNavigateToBookingDetails = {},
+            onNavigateToAdmin = {}
         )
     }
 }
@@ -178,7 +183,8 @@ fun HomeScreenEmptyPreview() {
             onNavigateToBooking = {},
             onNavigateToSchedule = {},
             onNavigateToNotifications = {},
-            onNavigateToBookingDetails = {}
+            onNavigateToBookingDetails = {},
+            onNavigateToAdmin = {}
         )
     }
 }

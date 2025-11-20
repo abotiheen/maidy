@@ -77,6 +77,11 @@ sealed class Screen(
      * Terms and Conditions screen - display app terms and conditions
      */
     data object TermsAndConditions : Screen("terms_and_conditions", "Terms and Conditions")
+    
+    /**
+     * Admin Add Maid screen - for populating Firebase with maid data
+     */
+    data object AdminAddMaid : Screen("admin_add_maid", "Add Maid")
 }
 
 /**
@@ -95,6 +100,7 @@ fun getScreenFromRoute(route: String?): Screen {
         route.startsWith("rating") -> Screen.Rating
         route.startsWith("settings") -> Screen.Settings
         route.startsWith("terms_and_conditions") -> Screen.TermsAndConditions
+        route.startsWith("admin_add_maid") -> Screen.AdminAddMaid
         else -> Screen.Auth
     }
 }

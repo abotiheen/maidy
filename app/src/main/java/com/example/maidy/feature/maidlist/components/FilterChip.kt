@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,20 +29,23 @@ fun FilterChip(
     modifier: Modifier = Modifier,
     showIcon: Boolean = false
 ) {
+    // Get specialty-specific colors if this is a specialty tag filter
+    val (specialtyBg, specialtyText) = getFilterChipColors(label)
+    
     val backgroundColor = if (isSelected) {
-        MaidListFilterChipSelectedBackground
+        specialtyBg
     } else {
         MaidListFilterChipUnselectedBackground
     }
     
     val textColor = if (isSelected) {
-        MaidListFilterChipSelectedText
+        specialtyText
     } else {
         MaidListFilterChipUnselectedText
     }
     
     val borderColor = if (isSelected) {
-        MaidListFilterChipSelectedBorder
+        specialtyText.copy(alpha = 0.3f)
     } else {
         MaidListFilterChipUnselectedBorder
     }
@@ -83,6 +87,40 @@ fun FilterChip(
     }
 }
 
+/**
+ * Returns the background and text colors for filter chips based on specialty tag
+ */
+@Composable
+private fun getFilterChipColors(label: String): Pair<Color, Color> {
+    return when (label) {
+        "Deep Cleaning" -> Pair(
+            MaidListServiceChipDeepCleaningBg,
+            MaidListServiceChipDeepCleaningText
+        )
+        "Eco-Friendly" -> Pair(
+            MaidListServiceChipEcoFriendlyBg,
+            MaidListServiceChipEcoFriendlyText
+        )
+        "Pet-Friendly" -> Pair(
+            MaidListServiceChipPetFriendlyBg,
+            MaidListServiceChipPetFriendlyText
+        )
+        "Move In/Out" -> Pair(
+            MaidListServiceChipMoveInOutBg,
+            MaidListServiceChipMoveInOutText
+        )
+        "Same Day Service" -> Pair(
+            // Using a purple/lavender color scheme for Same Day Service
+            Color(0xFFE8E4F3),  // Light purple background
+            Color(0xFF6C4AB6)   // Purple text
+        )
+        else -> Pair(
+            MaidListFilterChipSelectedBackground,
+            MaidListFilterChipSelectedText
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun FilterChipPreview() {
@@ -93,32 +131,33 @@ fun FilterChipPreview() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Filter Chip - Unselected", fontWeight = FontWeight.Bold)
-        FilterChip(
-            label = "Pet Friendly",
-            isSelected = false,
-            onClick = {}
-        )
+        Text("Specialty Tags - Unselected", fontWeight = FontWeight.Bold)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(label = "Deep Cleaning", isSelected = false, onClick = {})
+            FilterChip(label = "Eco-Friendly", isSelected = false, onClick = {})
+        }
         
-        Text("Filter Chip - Selected", fontWeight = FontWeight.Bold)
-        FilterChip(
-            label = "Pet Friendly",
-            isSelected = true,
-            onClick = {}
-        )
+        Text("Specialty Tags - Selected", fontWeight = FontWeight.Bold)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(label = "Deep Cleaning", isSelected = true, onClick = {})
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(label = "Eco-Friendly", isSelected = true, onClick = {})
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(label = "Pet-Friendly", isSelected = true, onClick = {})
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(label = "Move In/Out", isSelected = true, onClick = {})
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(label = "Same Day Service", isSelected = true, onClick = {})
+        }
         
-        Text("Filter Chip with Icon - Unselected", fontWeight = FontWeight.Bold)
+        Text("Generic Filter Chip with Icon", fontWeight = FontWeight.Bold)
         FilterChip(
             label = "Filters",
             isSelected = false,
-            onClick = {},
-            showIcon = true
-        )
-        
-        Text("Filter Chip with Icon - Selected", fontWeight = FontWeight.Bold)
-        FilterChip(
-            label = "Filters",
-            isSelected = true,
             onClick = {},
             showIcon = true
         )

@@ -17,14 +17,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.maidy.feature.maidlist.components.FilterChipsRow
 import com.example.maidy.feature.maidlist.components.MaidListCard
 import com.example.maidy.ui.theme.*
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MaidListScreen(
-    viewModel: MaidListViewModel = viewModel(),
+    viewModel: MaidListViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -52,12 +52,6 @@ private fun MaidListScreenContent(
             filters = uiState.filters,
             onFilterClick = { filterId ->
                 onEvent(MaidListUiEvent.OnFilterChipClick(filterId))
-            },
-            onLocationClick = {
-                onEvent(MaidListUiEvent.OnLocationClick)
-            },
-            onDateTimeClick = {
-                onEvent(MaidListUiEvent.OnDateTimeClick)
             }
         )
 
@@ -94,7 +88,7 @@ private fun MaidListScreenContent(
                 }
             }
 
-            uiState.maids.isEmpty() -> {
+            uiState.filteredMaids.isEmpty() -> {
                 // Empty State
                 Box(
                     modifier = Modifier
@@ -134,11 +128,11 @@ private fun MaidListScreenContent(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(
-                        items = uiState.maids,
+                        items = uiState.filteredMaids,
                         key = { maid -> maid.id }
                     ) { maid ->
                         MaidListCard(
-                            maidProfile = maid,
+                            maid = maid,
                             onSelectClick = {
                                 onEvent(MaidListUiEvent.OnSelectMaidClick(maid.id))
                             },
@@ -159,43 +153,28 @@ fun MaidListScreenPreview() {
     // Preview with placeholder data
     val previewState = MaidListUiState(
         filters = listOf(
-            FilterOption("1", "Pet Friendly", isSelected = false),
-            FilterOption("2", "Available Tomorrow", isSelected = true),
-            FilterOption("3", "Eco-Friendly", isSelected = false),
-            FilterOption("4", "Top Rated", isSelected = false),
+            FilterOption("1", "Deep Cleaning", isSelected = false),
+            FilterOption("2", "Eco-Friendly", isSelected = true),
+            FilterOption("3", "Pet-Friendly", isSelected = false),
         ),
-        maids = listOf(
-            MaidProfile(
+        filteredMaids = listOf(
+            com.example.maidy.core.model.Maid(
                 id = "1",
-                name = "Maria S.",
-                rating = 4.9f,
+                fullName = "Hala Al-Fahad",
+                averageRating = 4.9,
                 reviewCount = 120,
-                services = listOf(ServiceTag.DEEP_CLEANING)
+                specialtyTag = "Deep Cleaning",
+                profileImageUrl = "",
+                available = true
             ),
-            MaidProfile(
+            com.example.maidy.core.model.Maid(
                 id = "2",
-                name = "Isabella R.",
-                rating = 4.8f,
+                fullName = "Sara Mohammed",
+                averageRating = 4.8,
                 reviewCount = 95,
-                services = listOf(ServiceTag.ECO_FRIENDLY)
-            ),
-            MaidProfile(
-                id = "3",
-                name = "Chloe T.",
-                rating = 4.7f,
-                reviewCount = 88,
-                services = listOf(ServiceTag.PET_FRIENDLY)
-            ),
-            MaidProfile(
-                id = "4",
-                name = "Sophie M.",
-                rating = 4.8f,
-                reviewCount = 103,
-                services = listOf(
-                    ServiceTag.PET_FRIENDLY,
-                    ServiceTag.ECO_FRIENDLY,
-                    ServiceTag.LAUNDRY
-                )
+                specialtyTag = "Eco-Friendly",
+                profileImageUrl = "",
+                available = true
             ),
         )
     )
@@ -220,9 +199,9 @@ fun MaidListScreenLoadingPreview() {
 fun MaidListScreenEmptyPreview() {
     MaidListScreenContent(
         uiState = MaidListUiState(
-            maids = emptyList(),
+            filteredMaids = emptyList(),
             filters = listOf(
-                FilterOption("1", "Pet Friendly", isSelected = true),
+                FilterOption("1", "Pet-Friendly", isSelected = true),
             )
         ),
         onEvent = {}

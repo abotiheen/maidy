@@ -1,30 +1,15 @@
 package com.example.maidy.feature.maidlist
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.maidy.core.data.MaidRepository
+import com.example.maidy.core.model.Maid
+import com.example.maidy.core.model.SpecialtyTags
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-
-// Placeholder data models
-data class MaidProfile(
-    val id: String,
-    val name: String,
-    val rating: Float,
-    val reviewCount: Int,
-    val services: List<ServiceTag>,
-    val profileImageUrl: String = "" // Placeholder for future API
-)
-
-enum class ServiceTag(val displayName: String) {
-    DEEP_CLEANING("Deep Cleaning"),
-    ECO_FRIENDLY("Eco-Friendly"),
-    PET_FRIENDLY("Pet-Friendly"),
-    MOVE_IN_OUT("Move In/Out"),
-    IRONING("Ironing"),
-    LAUNDRY("Laundry"),
-    WINDOW_CLEANING("Window Cleaning")
-}
+import kotlinx.coroutines.launch
 
 data class FilterOption(
     val id: String,
@@ -33,10 +18,9 @@ data class FilterOption(
 )
 
 data class MaidListUiState(
-    val maids: List<MaidProfile> = emptyList(),
+    val allMaids: List<Maid> = emptyList(), // All maids from Firebase
+    val filteredMaids: List<Maid> = emptyList(), // Filtered maids based on selected filters
     val filters: List<FilterOption> = emptyList(),
-    val selectedLocation: String = "Select Location",
-    val selectedDateTime: String = "Select Date & Time",
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )
@@ -44,18 +28,19 @@ data class MaidListUiState(
 sealed class MaidListUiEvent {
     object OnBackClick : MaidListUiEvent()
     data class OnFilterChipClick(val filterId: String) : MaidListUiEvent()
-    object OnLocationClick : MaidListUiEvent()
-    object OnDateTimeClick : MaidListUiEvent()
     data class OnSelectMaidClick(val maidId: String) : MaidListUiEvent()
     data class OnViewDetailsClick(val maidId: String) : MaidListUiEvent()
 }
 
-class MaidListViewModel : ViewModel() {
+class MaidListViewModel(
+    private val maidRepository: MaidRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(MaidListUiState())
     val uiState: StateFlow<MaidListUiState> = _uiState.asStateFlow()
 
     init {
-        loadPlaceholderData()
+        loadFilters()
+        loadMaids()
     }
 
     fun onEvent(event: MaidListUiEvent) {
@@ -66,12 +51,6 @@ class MaidListViewModel : ViewModel() {
             is MaidListUiEvent.OnFilterChipClick -> {
                 toggleFilter(event.filterId)
             }
-            is MaidListUiEvent.OnLocationClick -> {
-                // TODO: Show location picker
-            }
-            is MaidListUiEvent.OnDateTimeClick -> {
-                // TODO: Show date time picker
-            }
             is MaidListUiEvent.OnSelectMaidClick -> {
                 // TODO: Navigate to booking confirmation
             }
@@ -81,8 +60,47 @@ class MaidListViewModel : ViewModel() {
         }
     }
 
+    private fun loadFilters() {
+        // Initialize filters from SpecialtyTags
+        val filters = SpecialtyTags.tags.map { tag ->
+            FilterOption(
+                id = tag,
+                label = tag,
+                isSelected = false
+            )
+        }
+        _uiState.update { it.copy(filters = filters) }
+    }
+
+    private fun loadMaids() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            
+            maidRepository.getAllMaids()
+                .onSuccess { maids ->
+                    // Show all maids regardless of availability
+                    _uiState.update {
+                        it.copy(
+                            allMaids = maids,
+                            filteredMaids = maids,
+                            isLoading = false
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    _uiState.update { 
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Failed to load maids: ${error.message}"
+                        )
+                    }
+                }
+        }
+    }
+
     private fun toggleFilter(filterId: String) {
         _uiState.update { currentState ->
+            // Update filter selection
             val updatedFilters = currentState.filters.map { filter ->
                 if (filter.id == filterId) {
                     filter.copy(isSelected = !filter.isSelected)
@@ -90,61 +108,24 @@ class MaidListViewModel : ViewModel() {
                     filter
                 }
             }
-            currentState.copy(filters = updatedFilters)
-        }
-        // In a real app, you would also filter the maids list here
-    }
-
-    private fun loadPlaceholderData() {
-        // Placeholder data - will be replaced with API calls
-        _uiState.update {
-            it.copy(
-                // Filters will come from backend API
-                filters = emptyList(),
-                maids = listOf(
-                    MaidProfile(
-                        id = "1",
-                        name = "Maria S.",
-                        rating = 4.9f,
-                        reviewCount = 120,
-                        services = listOf(ServiceTag.DEEP_CLEANING)
-                    ),
-                    MaidProfile(
-                        id = "2",
-                        name = "Isabella R.",
-                        rating = 4.8f,
-                        reviewCount = 95,
-                        services = listOf(ServiceTag.ECO_FRIENDLY)
-                    ),
-                    MaidProfile(
-                        id = "3",
-                        name = "Chloe T.",
-                        rating = 4.7f,
-                        reviewCount = 88,
-                        services = listOf(ServiceTag.PET_FRIENDLY)
-                    ),
-                    MaidProfile(
-                        id = "4",
-                        name = "David L.",
-                        rating = 4.9f,
-                        reviewCount = 150,
-                        services = listOf(ServiceTag.MOVE_IN_OUT)
-                    ),
-                    MaidProfile(
-                        id = "5",
-                        name = "Emma W.",
-                        rating = 4.6f,
-                        reviewCount = 72,
-                        services = listOf(ServiceTag.DEEP_CLEANING, ServiceTag.ECO_FRIENDLY)
-                    ),
-                    MaidProfile(
-                        id = "6",
-                        name = "Sophie M.",
-                        rating = 4.8f,
-                        reviewCount = 103,
-                        services = listOf(ServiceTag.PET_FRIENDLY, ServiceTag.ECO_FRIENDLY, ServiceTag.LAUNDRY)
-                    ),
-                )
+            
+            // Get selected filter tags
+            val selectedTags = updatedFilters.filter { it.isSelected }.map { it.id }
+            
+            // Filter maids by selected specialty tags
+            val filteredMaids = if (selectedTags.isEmpty()) {
+                // No filters selected, show all maids
+                currentState.allMaids
+            } else {
+                // Show maids that match any of the selected specialty tags
+                currentState.allMaids.filter { maid ->
+                    selectedTags.contains(maid.specialtyTag)
+                }
+            }
+            
+            currentState.copy(
+                filters = updatedFilters,
+                filteredMaids = filteredMaids
             )
         }
     }

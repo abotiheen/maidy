@@ -18,8 +18,6 @@ import com.example.maidy.ui.theme.*
 fun FilterChipsRow(
     filters: List<FilterOption>,
     onFilterClick: (String) -> Unit,
-    onLocationClick: () -> Unit,
-    onDateTimeClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyRow(
@@ -27,35 +25,7 @@ fun FilterChipsRow(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Filters chip with icon
-        item {
-            FilterChip(
-                label = "Filters",
-                isSelected = false,
-                onClick = { /* TODO: Open filters bottom sheet */ },
-                showIcon = true
-            )
-        }
-        
-        // Location selector chip
-        item {
-            FilterChip(
-                label = "Location",
-                isSelected = false,
-                onClick = onLocationClick
-            )
-        }
-        
-        // Date & Time selector chip
-        item {
-            FilterChip(
-                label = "Date & Time",
-                isSelected = false,
-                onClick = onDateTimeClick
-            )
-        }
-        
-        // Dynamic filter chips from backend
+        // Specialty tag filter chips
         items(
             items = filters,
             key = { filter -> filter.id }
@@ -84,33 +54,31 @@ fun FilterChipsRowPreview() {
             modifier = Modifier.padding(16.dp)
         )
         
-        // Preview with empty filters (will be populated from backend)
+        // Preview with empty filters
         FilterChipsRow(
             filters = emptyList(),
-            onFilterClick = {},
-            onLocationClick = {},
-            onDateTimeClick = {}
+            onFilterClick = {}
         )
         
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            "Filter Chips Row - With Sample Filters",
+            "Filter Chips Row - With Specialty Tags",
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
             modifier = Modifier.padding(16.dp)
         )
         
-        // Preview with sample filters to show how it looks
+        // Preview with specialty tag filters
         FilterChipsRow(
             filters = listOf(
-                FilterOption("1", "Pet Friendly", isSelected = false),
-                FilterOption("2", "Available Tomorrow", isSelected = true),
-                FilterOption("3", "Eco-Friendly", isSelected = false),
+                FilterOption("1", "Deep Cleaning", isSelected = false),
+                FilterOption("2", "Eco-Friendly", isSelected = true),
+                FilterOption("3", "Pet-Friendly", isSelected = false),
+                FilterOption("4", "Move In/Out", isSelected = false),
+                FilterOption("5", "Same Day Service", isSelected = false),
             ),
-            onFilterClick = {},
-            onLocationClick = {},
-            onDateTimeClick = {}
+            onFilterClick = {}
         )
     }
 }

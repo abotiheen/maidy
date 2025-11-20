@@ -13,17 +13,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.maidy.feature.maidlist.MaidProfile
-import com.example.maidy.feature.maidlist.ServiceTag
+import coil.compose.AsyncImage
+import com.example.maidy.core.model.Maid
 import com.example.maidy.ui.theme.*
 
 @Composable
 fun MaidListCard(
-    maidProfile: MaidProfile,
+    maid: Maid,
     onSelectClick: () -> Unit,
     onViewDetailsClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -48,7 +50,7 @@ fun MaidListCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Profile Image Placeholder
+                // Profile Image
                 Box(
                     modifier = Modifier
                         .size(80.dp)
@@ -61,12 +63,23 @@ fun MaidListCard(
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Maid Profile",
-                        tint = BookingStatusServiceLabel,
-                        modifier = Modifier.size(48.dp)
-                    )
+                    if (maid.profileImageUrl.isNotEmpty()) {
+                        AsyncImage(
+                            model = maid.profileImageUrl,
+                            contentDescription = "Profile picture of ${maid.fullName}",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Maid Profile",
+                            tint = BookingStatusServiceLabel,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
                 }
                 
                 // Maid Info - Name and Rating vertically stacked, centered with image
@@ -76,7 +89,7 @@ fun MaidListCard(
                 ) {
                     // Name
                     Text(
-                        text = maidProfile.name,
+                        text = maid.fullName,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaidListMaidName
@@ -96,14 +109,14 @@ fun MaidListCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = String.format("%.1f", maidProfile.rating),
+                            text = String.format("%.1f", maid.averageRating),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = MaidListMaidRating
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "(${maidProfile.reviewCount})",
+                            text = "(${maid.reviewCount})",
                             fontSize = 14.sp,
                             color = MaidListRatingCount
                         )
@@ -111,38 +124,34 @@ fun MaidListCard(
                 }
             }
             
-            // Service Tags/Chips
-            if (maidProfile.services.isNotEmpty()) {
+            // Specialty Tag
+            if (maid.specialtyTag.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Simple row layout for service chips
+                val (backgroundColor, textColor) = getSpecialtyTagColors(maid.specialtyTag)
+                
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    maidProfile.services.take(3).forEach { service ->
-                        ServiceChip(serviceTag = service)
-                    }
-                    if (maidProfile.services.size > 3) {
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(MaidListServiceChipDeepCleaningBg)
-                                .border(
-                                    width = 1.dp,
-                                    color = MaidListServiceChipDeepCleaningText.copy(alpha = 0.3f),
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                .padding(horizontal = 12.dp, vertical = 6.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "+${maidProfile.services.size - 3}",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = MaidListServiceChipDeepCleaningText
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(backgroundColor)
+                            .border(
+                                width = 1.dp,
+                                color = textColor.copy(alpha = 0.3f),
+                                shape = RoundedCornerShape(12.dp)
                             )
-                        }
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = maid.specialtyTag,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = textColor
+                        )
                     }
                 }
             }
@@ -154,22 +163,33 @@ fun MaidListCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Select Button
+                // Select Button (or Not Available)
                 Button(
                     onClick = onSelectClick,
+                    enabled = maid.available,
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaidListSelectButtonBackground
+                        containerColor = if (maid.available) {
+                            MaidListSelectButtonBackground
+                        } else {
+                            Color(0xFFE0E0E0) // Light gray for disabled
+                        },
+                        disabledContainerColor = Color(0xFFE0E0E0),
+                        disabledContentColor = Color(0xFF9E9E9E)
                     )
                 ) {
                     Text(
-                        text = "Select",
+                        text = if (maid.available) "Select" else "Not Available",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = MaidListSelectButtonText
+                        color = if (maid.available) {
+                            MaidListSelectButtonText
+                        } else {
+                            Color(0xFF9E9E9E) // Gray text for disabled
+                        }
                     )
                 }
                 
@@ -197,6 +217,40 @@ fun MaidListCard(
     }
 }
 
+/**
+ * Returns the background and text colors for a given specialty tag
+ */
+@Composable
+private fun getSpecialtyTagColors(specialtyTag: String): Pair<Color, Color> {
+    return when (specialtyTag) {
+        "Deep Cleaning" -> Pair(
+            MaidListServiceChipDeepCleaningBg,
+            MaidListServiceChipDeepCleaningText
+        )
+        "Eco-Friendly" -> Pair(
+            MaidListServiceChipEcoFriendlyBg,
+            MaidListServiceChipEcoFriendlyText
+        )
+        "Pet-Friendly" -> Pair(
+            MaidListServiceChipPetFriendlyBg,
+            MaidListServiceChipPetFriendlyText
+        )
+        "Move In/Out" -> Pair(
+            MaidListServiceChipMoveInOutBg,
+            MaidListServiceChipMoveInOutText
+        )
+        "Same Day Service" -> Pair(
+            // Using a purple/lavender color scheme for Same Day Service
+            Color(0xFFE8E4F3),  // Light purple background
+            Color(0xFF6C4AB6)   // Purple text
+        )
+        else -> Pair(
+            MaidListServiceChipDeepCleaningBg,
+            MaidListServiceChipDeepCleaningText
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun MaidListCardPreview() {
@@ -207,44 +261,91 @@ fun MaidListCardPreview() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Single Service", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text("Deep Cleaning", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         MaidListCard(
-            maidProfile = MaidProfile(
+            maid = Maid(
                 id = "1",
-                name = "Maria S.",
-                rating = 4.9f,
+                fullName = "Hala Al-Fahad",
+                averageRating = 4.9,
                 reviewCount = 120,
-                services = listOf(ServiceTag.DEEP_CLEANING)
+                specialtyTag = "Deep Cleaning",
+                profileImageUrl = "",
+                available = true
             ),
             onSelectClick = {},
             onViewDetailsClick = {}
         )
         
-        Text("Multiple Services", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text("Eco-Friendly", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         MaidListCard(
-            maidProfile = MaidProfile(
+            maid = Maid(
                 id = "2",
-                name = "Sophie M.",
-                rating = 4.8f,
+                fullName = "Sara Mohammed",
+                averageRating = 4.8,
                 reviewCount = 103,
-                services = listOf(
-                    ServiceTag.PET_FRIENDLY,
-                    ServiceTag.ECO_FRIENDLY,
-                    ServiceTag.LAUNDRY
-                )
+                specialtyTag = "Eco-Friendly",
+                profileImageUrl = "",
+                available = true
             ),
             onSelectClick = {},
             onViewDetailsClick = {}
         )
         
-        Text("No Services", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text("Pet-Friendly", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         MaidListCard(
-            maidProfile = MaidProfile(
+            maid = Maid(
                 id = "3",
-                name = "Isabella R.",
-                rating = 4.7f,
+                fullName = "Fatima Ali",
+                averageRating = 4.7,
                 reviewCount = 88,
-                services = emptyList()
+                specialtyTag = "Pet-Friendly",
+                profileImageUrl = "",
+                available = true
+            ),
+            onSelectClick = {},
+            onViewDetailsClick = {}
+        )
+        
+        Text("Move In/Out", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        MaidListCard(
+            maid = Maid(
+                id = "4",
+                fullName = "Layla Hassan",
+                averageRating = 4.6,
+                reviewCount = 75,
+                specialtyTag = "Move In/Out",
+                profileImageUrl = "",
+                available = true
+            ),
+            onSelectClick = {},
+            onViewDetailsClick = {}
+        )
+        
+        Text("Same Day Service", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        MaidListCard(
+            maid = Maid(
+                id = "5",
+                fullName = "Noor Ahmed",
+                averageRating = 4.9,
+                reviewCount = 145,
+                specialtyTag = "Same Day Service",
+                profileImageUrl = "",
+                available = true
+            ),
+            onSelectClick = {},
+            onViewDetailsClick = {}
+        )
+        
+        Text("Not Available Maid", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        MaidListCard(
+            maid = Maid(
+                id = "6",
+                fullName = "Aisha Rahman",
+                averageRating = 4.8,
+                reviewCount = 92,
+                specialtyTag = "Deep Cleaning",
+                profileImageUrl = "",
+                available = false
             ),
             onSelectClick = {},
             onViewDetailsClick = {}

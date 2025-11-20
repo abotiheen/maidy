@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ fun HomeHeader(
     profileImageUrl: String,
     hasNotifications: Boolean,
     onNotificationClick: () -> Unit,
+    onAdminClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -73,9 +75,24 @@ fun HomeHeader(
             fontWeight = FontWeight.Bold,
             color = Color.Black
         )
+        
+        // Action buttons row
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Admin Icon
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Admin",
+                modifier = Modifier
+                    .size(28.dp)
+                    .clickable(onClick = onAdminClick),
+                tint = Color(0xFF4299E1)
+            )
 
-        // Notification Bell
-        BadgedBox(
+            // Notification Bell
+            BadgedBox(
             badge = {
                 if (hasNotifications) {
                     Badge(
@@ -84,15 +101,16 @@ fun HomeHeader(
                     )
                 }
             }
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground), // TODO: Replace with bell icon
-                contentDescription = "Notifications",
-                modifier = Modifier
-                    .size(32.dp)
-                    .clickable(onClick = onNotificationClick),
-                tint = Color.Black
-            )
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground), // TODO: Replace with bell icon
+                    contentDescription = "Notifications",
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable(onClick = onNotificationClick),
+                    tint = Color.Black
+                )
+            }
         }
     }
 }

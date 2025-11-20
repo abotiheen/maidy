@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.maidy.feature.admin.AdminAddMaidScreen
 import com.example.maidy.feature.auth.AuthScreen
 import com.example.maidy.feature.booking.BookingStatusScreen
 import com.example.maidy.feature.home.HomeScreen
@@ -120,7 +121,14 @@ fun MaidyNavHost(
         
         // Home Screen - Main Dashboard
         composable(route = Screen.Home.route) {
-            HomeScreen()
+            HomeScreen(
+                onNavigateToBooking = {
+                    navController.navigate(Screen.MaidList.route)
+                },
+                onNavigateToAdmin = {
+                    navController.navigate(Screen.AdminAddMaid.route)
+                }
+            )
         }
         
         // Maid List Screen - Browse Available Maids
@@ -186,6 +194,15 @@ fun MaidyNavHost(
         // Terms and Conditions Screen
         composable(route = Screen.TermsAndConditions.route) {
             TermsAndConditionsScreen()
+        }
+        
+        // Admin Add Maid Screen - For populating Firebase
+        composable(route = Screen.AdminAddMaid.route) {
+            AdminAddMaidScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
         }
     }
