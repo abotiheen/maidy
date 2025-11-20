@@ -1,46 +1,36 @@
 package com.example.maidy.feature.maid_details
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.maidy.core.data.MaidRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-// Placeholder data models
+// Maid profile data for UI
 data class MaidProfile(
     val id: String,
     val name: String,
     val isVerified: Boolean,
-    val rating: Float,
+    val rating: Double,
     val reviewCount: Int,
     val about: String,
-    val services: List<ServiceOffered>,
+    val services: List<String>,
     val reviews: List<CustomerReview>,
-    val pricePerHour: Int,
-    val profileImageUrl: String = "" // Placeholder
+    val pricePerHour: Double,
+    val profileImageUrl: String = "",
+    val specialtyTag: String = "",
+    val isAvailable: Boolean = true
 )
-
-data class ServiceOffered(
-    val id: String,
-    val name: String,
-    val iconType: ServiceIconType
-)
-
-enum class ServiceIconType {
-    KITCHEN_CLEANING,
-    BATHROOM_CLEANING,
-    LAUNDRY,
-    DUSTING,
-    VACUUMING,
-    WINDOW_WASHING
-}
 
 data class CustomerReview(
     val id: String,
     val reviewerName: String,
-    val reviewerImageUrl: String = "", // Placeholder
+    val reviewerImageUrl: String = "",
     val date: String,
-    val rating: Float,
+    val rating: Int,
     val comment: String
 )
 
@@ -64,12 +54,74 @@ sealed class MaidProfileUiEvent {
     object OnBookmarkClick : MaidProfileUiEvent()
 }
 
-class MaidProfileViewModel : ViewModel() {
+class MaidProfileViewModel(
+    private val maidRepository: MaidRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(MaidProfileUiState())
     val uiState: StateFlow<MaidProfileUiState> = _uiState.asStateFlow()
 
-    init {
-        loadPlaceholderData()
+    fun loadMaid(maidId: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            
+            try {
+                // Fetch maid details
+                val maidResult = maidRepository.getMaidById(maidId)
+                if (maidResult.isFailure) {
+                    _uiState.update { 
+                        it.copy(
+                            isLoading = false,
+                            error = "Failed to load maid: ${maidResult.exceptionOrNull()?.message}"
+                        )
+                    }
+                    return@launch
+                }
+                
+                val maid = maidResult.getOrNull()!!
+                
+                // Fetch reviews
+                val reviewsResult = maidRepository.getMaidReviews(maidId)
+                val reviews = reviewsResult.getOrNull() ?: emptyList()
+                
+                // Map to UI model
+                val maidProfile = MaidProfile(
+                    id = maid.id,
+                    name = maid.fullName,
+                    isVerified = maid.verified,
+                    rating = maid.averageRating,
+                    reviewCount = maid.reviewCount,
+                    about = maid.bio,
+                    services = maid.services,
+                    reviews = reviews.map { review ->
+                        CustomerReview(
+                            id = review.id,
+                            reviewerName = review.reviewerName,
+                            date = review.date,
+                            rating = review.rating,
+                            comment = review.comment
+                        )
+                    },
+                    pricePerHour = maid.hourlyRate,
+                    profileImageUrl = maid.profileImageUrl,
+                    specialtyTag = maid.specialtyTag,
+                    isAvailable = maid.available
+                )
+                
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        maidProfile = maidProfile
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "Error: ${e.message}"
+                    )
+                }
+            }
+        }
     }
 
     fun onEvent(event: MaidProfileUiEvent) {
@@ -88,50 +140,7 @@ class MaidProfileViewModel : ViewModel() {
             }
         }
     }
-
-    private fun loadPlaceholderData() {
-        // Placeholder data - will be replaced with API calls
-        val placeholderProfile = MaidProfile(
-            id = "1",
-            name = "Elena Rodriguez",
-            isVerified = true,
-            rating = 4.9f,
-            reviewCount = 125,
-            about = "Hello! I'm Elena, and I've been a professional cleaner for over 5 years. I take great pride in making homes sparkle and creating a fresh, relaxing environment for my clients. I'm reliable, thorough, and always bring a positive attitude.",
-            services = listOf(
-                ServiceOffered("1", "Kitchen Cleaning", ServiceIconType.KITCHEN_CLEANING),
-                ServiceOffered("2", "Bathroom Cleaning", ServiceIconType.BATHROOM_CLEANING),
-                ServiceOffered("3", "Laundry", ServiceIconType.LAUNDRY),
-                ServiceOffered("4", "Dusting", ServiceIconType.DUSTING),
-                ServiceOffered("5", "Vacuuming", ServiceIconType.VACUUMING),
-                ServiceOffered("6", "Window Washing", ServiceIconType.WINDOW_WASHING)
-            ),
-            reviews = listOf(
-                CustomerReview(
-                    id = "1",
-                    reviewerName = "Mark Johnson",
-                    date = "June 15, 2024",
-                    rating = 5f,
-                    comment = "Elena was fantastic! Our house has never looked this clean. She was professional, punctual, and incredibly thorough. Highly recommend!"
-                ),
-                CustomerReview(
-                    id = "2",
-                    reviewerName = "Sarah Lee",
-                    date = "June 12, 2024",
-                    rating = 5f,
-                    comment = "Absolutely amazing service. Elena paid attention to every little detail. I'm so happy with the result and will definitely be booking her again."
-                )
-            ),
-            pricePerHour = 25
-        )
-
-        _uiState.update {
-            it.copy(
-                isLoading = false,
-                maidProfile = placeholderProfile
-            )
-        }
-    }
 }
+
 
 

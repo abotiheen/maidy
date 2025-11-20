@@ -25,6 +25,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun MaidListScreen(
     viewModel: MaidListViewModel = koinViewModel(),
+    onNavigateToMaidDetails: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -32,6 +33,7 @@ fun MaidListScreen(
     MaidListScreenContent(
         uiState = uiState,
         onEvent = viewModel::onEvent,
+        onNavigateToMaidDetails = onNavigateToMaidDetails,
         modifier = modifier
     )
 }
@@ -40,6 +42,7 @@ fun MaidListScreen(
 private fun MaidListScreenContent(
     uiState: MaidListUiState,
     onEvent: (MaidListUiEvent) -> Unit,
+    onNavigateToMaidDetails: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -134,10 +137,12 @@ private fun MaidListScreenContent(
                         MaidListCard(
                             maid = maid,
                             onSelectClick = {
-                                onEvent(MaidListUiEvent.OnSelectMaidClick(maid.id))
+                                if (maid.available) {
+                                    onNavigateToMaidDetails(maid.id)
+                                }
                             },
                             onViewDetailsClick = {
-                                onEvent(MaidListUiEvent.OnViewDetailsClick(maid.id))
+                                onNavigateToMaidDetails(maid.id)
                             }
                         )
                     }
@@ -181,7 +186,8 @@ fun MaidListScreenPreview() {
 
     MaidListScreenContent(
         uiState = previewState,
-        onEvent = {}
+        onEvent = {},
+        onNavigateToMaidDetails = {}
     )
 }
 
@@ -190,7 +196,8 @@ fun MaidListScreenPreview() {
 fun MaidListScreenLoadingPreview() {
     MaidListScreenContent(
         uiState = MaidListUiState(isLoading = true),
-        onEvent = {}
+        onEvent = {},
+        onNavigateToMaidDetails = {}
     )
 }
 
@@ -204,7 +211,8 @@ fun MaidListScreenEmptyPreview() {
                 FilterOption("1", "Pet-Friendly", isSelected = true),
             )
         ),
-        onEvent = {}
+        onEvent = {},
+        onNavigateToMaidDetails = {}
     )
 }
 
@@ -215,7 +223,8 @@ fun MaidListScreenErrorPreview() {
         uiState = MaidListUiState(
             errorMessage = "Failed to load maids. Please try again."
         ),
-        onEvent = {}
+        onEvent = {},
+        onNavigateToMaidDetails = {}
     )
 }
 

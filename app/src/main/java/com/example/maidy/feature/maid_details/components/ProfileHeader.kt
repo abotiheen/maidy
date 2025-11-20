@@ -24,7 +24,7 @@ import com.example.maidy.ui.theme.*
 fun ProfileHeader(
     name: String,
     isVerified: Boolean,
-    rating: Float,
+    rating: Double,
     reviewCount: Int,
     profileImageUrl: String,
     modifier: Modifier = Modifier
@@ -129,7 +129,7 @@ fun ProfileHeaderPreview() {
             ProfileHeader(
                 name = "Elena Rodriguez",
                 isVerified = true,
-                rating = 4.9f,
+                rating = 4.9,
                 reviewCount = 125,
                 profileImageUrl = ""
             )

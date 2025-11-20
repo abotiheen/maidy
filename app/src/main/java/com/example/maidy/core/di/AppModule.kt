@@ -8,6 +8,7 @@ import com.example.maidy.core.util.ImageCompressor
 import com.example.maidy.feature.admin.AdminAddMaidViewModel
 import com.example.maidy.feature.auth.AuthViewModel
 import com.example.maidy.feature.home.HomeViewModel
+import com.example.maidy.feature.maid_details.MaidProfileViewModel
 import com.example.maidy.feature.maidlist.MaidListViewModel
 import com.example.maidy.feature.settings.ProfileViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -40,4 +41,5 @@ val appModule = module {
     viewModel { HomeViewModel(get(), get()) }
     viewModel { AdminAddMaidViewModel(get(), get()) }
     viewModel { MaidListViewModel(get()) }
+    viewModel { MaidProfileViewModel(get()) }
 }

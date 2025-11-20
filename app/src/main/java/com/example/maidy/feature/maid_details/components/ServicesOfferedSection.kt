@@ -9,13 +9,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.maidy.feature.maid_details.ServiceIconType
-import com.example.maidy.feature.maid_details.ServiceOffered
 import com.example.maidy.ui.theme.*
 
 @Composable
 fun ServicesOfferedSection(
-    services: List<ServiceOffered>,
+    services: List<String>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -41,8 +39,7 @@ fun ServicesOfferedSection(
             ) {
                 rowServices.forEach { service ->
                     ServiceItem(
-                        serviceName = service.name,
-                        iconType = service.iconType,
+                        serviceName = service,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -68,12 +65,12 @@ fun ServicesOfferedSectionPreview() {
         Box(modifier = Modifier.background(MaidProfileContentBackground)) {
             ServicesOfferedSection(
                 services = listOf(
-                    ServiceOffered("1", "Kitchen Cleaning", ServiceIconType.KITCHEN_CLEANING),
-                    ServiceOffered("2", "Bathroom Cleaning", ServiceIconType.BATHROOM_CLEANING),
-                    ServiceOffered("3", "Laundry", ServiceIconType.LAUNDRY),
-                    ServiceOffered("4", "Dusting", ServiceIconType.DUSTING),
-                    ServiceOffered("5", "Vacuuming", ServiceIconType.VACUUMING),
-                    ServiceOffered("6", "Window Washing", ServiceIconType.WINDOW_WASHING)
+                    "Kitchen Cleaning",
+                    "Bathroom Cleaning",
+                    "Laundry",
+                    "Dusting",
+                    "Vacuuming",
+                    "Window Washing"
                 )
             )
         }

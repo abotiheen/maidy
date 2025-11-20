@@ -36,7 +36,7 @@ fun CustomerReviewsSection(
                 reviewerName = review.reviewerName,
                 reviewerImageUrl = review.reviewerImageUrl,
                 date = review.date,
-                rating = review.rating,
+                rating = review.rating.toFloat(),
                 comment = review.comment
             )
 
@@ -57,7 +57,7 @@ fun CustomerReviewsSectionPreview() {
                         reviewerName = "Mark Johnson",
                         reviewerImageUrl = "",
                         date = "June 15, 2024",
-                        rating = 5f,
+                        rating = 5,
                         comment = "Elena was fantastic! Our house has never looked this clean. She was professional, punctual, and incredibly thorough. Highly recommend!"
                     ),
                     CustomerReview(
@@ -65,7 +65,7 @@ fun CustomerReviewsSectionPreview() {
                         reviewerName = "Sarah Lee",
                         reviewerImageUrl = "",
                         date = "June 12, 2024",
-                        rating = 5f,
+                        rating = 5,
                         comment = "Absolutely amazing service. Elena paid attention to every little detail. I'm so happy with the result and will definitely be booking her again."
                     )
                 )
@@ -73,5 +73,6 @@ fun CustomerReviewsSectionPreview() {
         }
     }
 }
+
 
 

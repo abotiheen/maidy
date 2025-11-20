@@ -133,7 +133,11 @@ fun MaidyNavHost(
         
         // Maid List Screen - Browse Available Maids
         composable(route = Screen.MaidList.route) {
-            MaidListScreen()
+            MaidListScreen(
+                onNavigateToMaidDetails = { maidId ->
+                    navController.navigate(Screen.MaidProfile.createRoute(maidId))
+                }
+            )
         }
         
         // Maid Profile Screen - View Detailed Maid Profile
@@ -144,8 +148,9 @@ fun MaidyNavHost(
                     type = NavType.StringType
                 }
             )
-        ) {
-            MaidProfileScreen()
+        ) { backStackEntry ->
+            val maidId = backStackEntry.arguments?.getString("maidId") ?: ""
+            MaidProfileScreen(maidId = maidId)
         }
         
         // Booking Status Screen - Track Current Booking

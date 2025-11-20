@@ -119,7 +119,7 @@ class MaidRepository(
     }
     
     /**
-     * Get a specific maid by ID (for future use)
+     * Get a specific maid by ID
      */
     suspend fun getMaidById(maidId: String): Result<Maid> {
         return try {
@@ -133,6 +133,23 @@ class MaidRepository(
             } else {
                 Result.failure(Exception("Maid not found"))
             }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    /**
+     * Get reviews for a specific maid
+     */
+    suspend fun getMaidReviews(maidId: String): Result<List<MaidReview>> {
+        return try {
+            val snapshot = firestore.collection("maids")
+                .document(maidId)
+                .collection("reviews")
+                .get()
+                .await()
+            val reviews = snapshot.documents.mapNotNull { it.toObject(MaidReview::class.java) }
+            Result.success(reviews)
         } catch (e: Exception) {
             Result.failure(e)
         }

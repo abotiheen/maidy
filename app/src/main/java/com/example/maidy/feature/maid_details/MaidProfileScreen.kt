@@ -6,24 +6,37 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.sp
 import com.example.maidy.feature.maid_details.components.*
 import com.example.maidy.ui.theme.MaidProfileBackground
 import com.example.maidy.ui.theme.MaidProfileContentBackground
+import com.example.maidy.ui.theme.MaidyErrorRed
 import com.example.maidy.ui.theme.MaidyTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MaidProfileScreen(
-    viewModel: MaidProfileViewModel = viewModel(),
+    maidId: String,
+    viewModel: MaidProfileViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(maidId) {
+        viewModel.loadMaid(maidId)
+    }
 
     MaidProfileContent(
         uiState = uiState,
@@ -45,32 +58,61 @@ fun MaidProfileContent(
             .fillMaxSize()
             .background(MaidProfileBackground)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Scrollable content
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                uiState.maidProfile?.let { profile ->
-                    // Profile Header
-                    ProfileHeader(
+        when {
+            uiState.isLoading -> {
+                // Loading State
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            
+            uiState.error != null -> {
+                // Error State
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = uiState.error,
+                        fontSize = 16.sp,
+                        color = MaidyErrorRed,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+            
+            uiState.maidProfile != null -> {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    // Scrollable content
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        val profile = uiState.maidProfile
+                        
+                        // Profile Header
+                        ProfileHeader(
                         name = profile.name,
                         isVerified = profile.isVerified,
                         rating = profile.rating,
                         reviewCount = profile.reviewCount,
                         profileImageUrl = profile.profileImageUrl,
                         modifier = Modifier.padding(top = 24.dp, bottom = 24.dp)
-                    )
+                        )
 
-                    // Tab Row
-                    ProfileTabRow(
+                        // Tab Row
+                        ProfileTabRow(
                         selectedTab = uiState.selectedTab,
                         onTabSelected = onTabSelected
-                    )
+                        )
 
-                    // Tab Content with Animation
-                    Box(
+                        // Tab Content with Animation
+                        Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(MaidProfileContentBackground)
@@ -114,20 +156,21 @@ fun MaidProfileContent(
                                     CustomerReviewsSection(reviews = profile.reviews)
                                 }
                             }
+                            }
                         }
+
+                        // Add bottom padding to account for the fixed bottom bar
+                        Spacer(modifier = Modifier.height(90.dp))
                     }
 
-                    // Add bottom padding to account for the fixed bottom bar
-                    Spacer(modifier = Modifier.height(90.dp))
-                }
-            }
+                    // Fixed Bottom Booking Bar
 
-            // Fixed Bottom Booking Bar
-            uiState.maidProfile?.let { profile ->
-                BottomBookingBar(
-                    pricePerHour = profile.pricePerHour,
-                    onBookNowClick = onBookNowClick
-                )
+                    BottomBookingBar(
+                        pricePerHour = uiState.maidProfile.pricePerHour,
+                        isAvailable = uiState.maidProfile.isAvailable,
+                        onBookNowClick = onBookNowClick
+                    )
+                }
             }
         }
     }
@@ -143,34 +186,36 @@ fun MaidProfileScreenPreview() {
                 id = "1",
                 name = "Elena Rodriguez",
                 isVerified = true,
-                rating = 4.9f,
+                rating = 4.9,
                 reviewCount = 125,
                 about = "Hello! I'm Elena, and I've been a professional cleaner for over 5 years. I take great pride in making homes sparkle and creating a fresh, relaxing environment for my clients. I'm reliable, thorough, and always bring a positive attitude.",
                 services = listOf(
-                    ServiceOffered("1", "Kitchen Cleaning", ServiceIconType.KITCHEN_CLEANING),
-                    ServiceOffered("2", "Bathroom Cleaning", ServiceIconType.BATHROOM_CLEANING),
-                    ServiceOffered("3", "Laundry", ServiceIconType.LAUNDRY),
-                    ServiceOffered("4", "Dusting", ServiceIconType.DUSTING),
-                    ServiceOffered("5", "Vacuuming", ServiceIconType.VACUUMING),
-                    ServiceOffered("6", "Window Washing", ServiceIconType.WINDOW_WASHING)
+                    "Kitchen Cleaning",
+                    "Bathroom Cleaning",
+                    "Laundry",
+                    "Dusting",
+                    "Vacuuming",
+                    "Window Washing"
                 ),
                 reviews = listOf(
                     CustomerReview(
                         id = "1",
                         reviewerName = "Mark Johnson",
                         date = "June 15, 2024",
-                        rating = 5f,
+                        rating = 5,
                         comment = "Elena was fantastic! Our house has never looked this clean. She was professional, punctual, and incredibly thorough. Highly recommend!"
                     ),
                     CustomerReview(
                         id = "2",
                         reviewerName = "Sarah Lee",
                         date = "June 12, 2024",
-                        rating = 5f,
+                        rating = 5,
                         comment = "Absolutely amazing service. Elena paid attention to every little detail. I'm so happy with the result and will definitely be booking her again."
                     )
                 ),
-                pricePerHour = 25
+                pricePerHour = 25.0,
+                specialtyTag = "Deep Cleaning",
+                isAvailable = true
             ),
             selectedTab = ProfileTab.ABOUT
         )
@@ -193,19 +238,21 @@ fun MaidProfileScreenServicesPreview() {
                 id = "1",
                 name = "Elena Rodriguez",
                 isVerified = true,
-                rating = 4.9f,
+                rating = 4.9,
                 reviewCount = 125,
                 about = "Hello! I'm Elena, and I've been a professional cleaner for over 5 years.",
                 services = listOf(
-                    ServiceOffered("1", "Kitchen Cleaning", ServiceIconType.KITCHEN_CLEANING),
-                    ServiceOffered("2", "Bathroom Cleaning", ServiceIconType.BATHROOM_CLEANING),
-                    ServiceOffered("3", "Laundry", ServiceIconType.LAUNDRY),
-                    ServiceOffered("4", "Dusting", ServiceIconType.DUSTING),
-                    ServiceOffered("5", "Vacuuming", ServiceIconType.VACUUMING),
-                    ServiceOffered("6", "Window Washing", ServiceIconType.WINDOW_WASHING)
+                    "Kitchen Cleaning",
+                    "Bathroom Cleaning",
+                    "Laundry",
+                    "Dusting",
+                    "Vacuuming",
+                    "Window Washing"
                 ),
                 reviews = listOf(),
-                pricePerHour = 25
+                pricePerHour = 25.0,
+                specialtyTag = "Deep Cleaning",
+                isAvailable = true
             ),
             selectedTab = ProfileTab.SERVICES
         )
@@ -228,7 +275,7 @@ fun MaidProfileScreenReviewsPreview() {
                 id = "1",
                 name = "Elena Rodriguez",
                 isVerified = true,
-                rating = 4.9f,
+                rating = 4.9,
                 reviewCount = 125,
                 about = "Hello! I'm Elena, and I've been a professional cleaner for over 5 years.",
                 services = listOf(),
@@ -237,18 +284,18 @@ fun MaidProfileScreenReviewsPreview() {
                         id = "1",
                         reviewerName = "Mark Johnson",
                         date = "June 15, 2024",
-                        rating = 5f,
+                        rating = 5,
                         comment = "Elena was fantastic! Our house has never looked this clean. She was professional, punctual, and incredibly thorough. Highly recommend!"
                     ),
                     CustomerReview(
                         id = "2",
                         reviewerName = "Sarah Lee",
                         date = "June 12, 2024",
-                        rating = 5f,
+                        rating = 5,
                         comment = "Absolutely amazing service. Elena paid attention to every little detail. I'm so happy with the result and will definitely be booking her again."
                     )
                 ),
-                pricePerHour = 25
+                pricePerHour = 25.0
             ),
             selectedTab = ProfileTab.REVIEWS
         )
@@ -260,5 +307,6 @@ fun MaidProfileScreenReviewsPreview() {
         )
     }
 }
+
 
 

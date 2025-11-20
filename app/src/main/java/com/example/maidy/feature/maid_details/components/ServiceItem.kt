@@ -4,23 +4,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.maidy.feature.maid_details.ServiceIconType
 import com.example.maidy.ui.theme.*
 
 @Composable
 fun ServiceItem(
     serviceName: String,
-    iconType: ServiceIconType,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -55,8 +51,7 @@ fun ServiceItemPreview() {
                 .padding(16.dp)
         ) {
             ServiceItem(
-                serviceName = "Kitchen Cleaning",
-                iconType = ServiceIconType.KITCHEN_CLEANING
+                serviceName = "Kitchen Cleaning"
             )
         }
     }

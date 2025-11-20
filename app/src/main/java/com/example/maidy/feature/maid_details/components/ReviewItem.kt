@@ -42,25 +42,6 @@ fun ReviewItem(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Reviewer Profile Picture
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(MaidProfileContentBackground)
-            ) {
-                if (reviewerImageUrl.isNotEmpty()) {
-                    AsyncImage(
-                        model = reviewerImageUrl,
-                        contentDescription = "Profile picture of $reviewerName",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = reviewerName,
@@ -124,5 +105,6 @@ fun ReviewItemPreview() {
         }
     }
 }
+
 
 
