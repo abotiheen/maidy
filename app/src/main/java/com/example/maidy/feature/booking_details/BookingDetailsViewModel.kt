@@ -95,6 +95,9 @@ class BookingDetailsViewModel(
                 // For recurring bookings, only allow single day selection
                 _uiState.update { it.copy(selectedDay = event.day) }
             }
+            is BookingDetailsEvent.RecurringTypeSelected -> {
+                _uiState.update { it.copy(recurringType = event.recurringType) }
+            }
             is BookingDetailsEvent.RecurringTimeSelected -> {
                 _uiState.update { it.copy(recurringTime = event.time) }
             }
@@ -176,8 +179,8 @@ class BookingDetailsViewModel(
                         specialInstructions = currentState.specialInstructions
                     )
                 } else {
-                    // Recurring booking
-                    val recurringType = RecurringType.WEEKLY // Default to weekly
+                    // Recurring booking - use selected recurring type
+                    val recurringType = currentState.recurringType
                     
                     // Get preferred day (full name like "Monday", "Tuesday")
                     val preferredDay = currentState.selectedDay?.fullName ?: ""
@@ -278,6 +281,7 @@ data class BookingDetailsUiState(
     val selectedDate: String = "November 20, 2024",
     val selectedTime: String = "10:00 AM",
     val selectedDay: Day? = null,  // Single day for recurring bookings
+    val recurringType: RecurringType = RecurringType.WEEKLY,  // Weekly, Biweekly, or Monthly
     val recurringTime: String = "10:00 AM",
     val specialInstructions: String = "",
     
@@ -297,6 +301,7 @@ sealed class BookingDetailsEvent {
     data class DateSelected(val date: String) : BookingDetailsEvent()
     data class TimeSelected(val time: String) : BookingDetailsEvent()
     data class DaySelected(val day: Day) : BookingDetailsEvent()
+    data class RecurringTypeSelected(val recurringType: RecurringType) : BookingDetailsEvent()
     data class RecurringTimeSelected(val time: String) : BookingDetailsEvent()
     data class NotesChanged(val notes: String) : BookingDetailsEvent()
     object ConfirmBooking : BookingDetailsEvent()

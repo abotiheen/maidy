@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.maidy.feature.booking_details.components.*
+import com.example.maidy.core.model.RecurringType
 import com.example.maidy.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -210,6 +211,15 @@ fun BookingDetailsScreen(
                         )
                     }
                     ScheduleType.RECURRING -> {
+                        // Recurring Type Selector (Weekly, Biweekly, Monthly)
+                        RecurringTypeSelector(
+                            selectedType = uiState.recurringType,
+                            onTypeSelected = { recurringType ->
+                                viewModel.onEvent(BookingDetailsEvent.RecurringTypeSelected(recurringType))
+                            }
+                        )
+                        
+                        // Day and Time Selector
                         RecurringScheduleSelector(
                             selectedDay = uiState.selectedDay,
                             selectedTime = uiState.recurringTime,
