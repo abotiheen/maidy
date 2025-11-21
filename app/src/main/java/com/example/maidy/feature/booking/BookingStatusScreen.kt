@@ -43,6 +43,7 @@ fun BookingStatusScreen(
     bookingId: String,
     onNavigateToSOS: () -> Unit = {},
     onNavigateToAdjustRecurring: () -> Unit = {},
+    onNavigateToRating: () -> Unit = {},
     viewModel: BookingStatusViewModel = koinViewModel(parameters = { parametersOf(bookingId) })
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -74,7 +75,7 @@ fun BookingStatusScreen(
         onDismissCancelDialog = viewModel::onDismissCancelDialog,
         onContactMaid = viewModel::onContactMaid,
         onSOSClicked = viewModel::onSOSClicked,
-        onRateMaid = viewModel::onRateMaid,
+        onRateMaid = onNavigateToRating,
         onDebugStatusChange = viewModel::changeBookingStatus,
         onManageRecurring = onNavigateToAdjustRecurring
     )

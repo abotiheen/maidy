@@ -72,9 +72,13 @@ sealed class Screen(
     /**
      * Rating screen - rate a maid after service completion
      * Route includes bookingId parameter: rating/{bookingId}
-     * (Screen not yet implemented, route reserved)
      */
-    data object Rating : Screen("rating/{bookingId}", "Rate Service") {
+    data object Rating : Screen(
+        "rating/{bookingId}",
+        "Rate Service",
+        showTopBar = true,
+        showBottomBar = false
+    ) {
         fun createRoute(bookingId: String): String {
             return "rating/$bookingId"
         }

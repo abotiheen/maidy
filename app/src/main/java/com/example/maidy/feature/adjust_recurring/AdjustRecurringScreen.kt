@@ -29,6 +29,7 @@ import java.util.*
 fun AdjustRecurringScreen(
     bookingId: String,
     onNavigateBack: () -> Unit,
+    onNavigateToRating: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val viewModel: AdjustRecurringViewModel = koinViewModel(
@@ -70,7 +71,7 @@ fun AdjustRecurringScreen(
                         reviewsCount = uiState.maidReviewsCount,
                         profileImageUrl = uiState.maidProfileImageUrl,
                         showRateButton = uiState.hasCompletedBefore,
-                        onRateClick = { /* TODO: Navigate to rating */ }
+                        onRateClick = onNavigateToRating
                     )
                 }
 

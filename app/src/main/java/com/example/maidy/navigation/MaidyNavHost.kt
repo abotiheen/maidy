@@ -27,6 +27,7 @@ import com.example.maidy.feature.booking_details.BookingDetailsScreen
 import com.example.maidy.feature.home.HomeScreen
 import com.example.maidy.feature.maid_details.MaidProfileScreen
 import com.example.maidy.feature.maidlist.MaidListScreen
+import com.example.maidy.feature.rating.RatingScreen
 import com.example.maidy.feature.settings.ProfileScreen
 import com.example.maidy.feature.sos.EmergencyScreen
 import com.example.maidy.feature.terms.TermsAndConditionsScreen
@@ -211,6 +212,9 @@ fun MaidyNavHost(
                 },
                 onNavigateToAdjustRecurring = {
                     navController.navigate(Screen.AdjustRecurring.createRoute(bookingId))
+                },
+                onNavigateToRating = {
+                    navController.navigate(Screen.Rating.createRoute(bookingId))
                 }
             )
         }
@@ -229,9 +233,12 @@ fun MaidyNavHost(
                     bookingId = bookingId,
                     onNavigateBack = {
                         navController.popBackStack()
-                }
-            )
-        }
+                    },
+                    onNavigateToRating = {
+                        navController.navigate(Screen.Rating.createRoute(bookingId))
+                    }
+                )
+            }
 
             // Emergency Screen - SOS/Emergency Help
             composable(route = Screen.Emergency.route) {
@@ -250,22 +257,37 @@ fun MaidyNavHost(
         }
         
         // Rating Screen - Rate Maid After Service
-        // TODO: Implement RatingScreen
-        composable(
-            route = Screen.Rating.route,
-            arguments = listOf(
-                navArgument("bookingId") {
-                    type = NavType.StringType
-                }
-            )
-        ) {
-            // Placeholder for future implementation
-            PlaceholderScreen(screenName = "Rating")
+            composable(
+                route = Screen.Rating.route,
+                arguments = listOf(
+                    navArgument("bookingId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                val bookingId = it.arguments?.getString("bookingId").orEmpty()
+                RatingScreen(
+                    bookingId = bookingId,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
         }
         
         // Settings Screen - App Settings and Preferences
         composable(route = Screen.Settings.route) {
-            ProfileScreen()
+            ProfileScreen(
+                onNavigateToAuth = {
+                    navController.navigate(Screen.Auth.route) {
+                        // Clear all back stack entries
+                        popUpTo(0) {
+                            inclusive = true
+                        }
+                        // Single instance of auth screen
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
         
         // Terms and Conditions Screen

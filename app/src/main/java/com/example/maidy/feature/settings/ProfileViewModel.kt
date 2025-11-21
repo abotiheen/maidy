@@ -156,11 +156,55 @@ class ProfileViewModel(
     }
     
     private fun logOut() {
+        // Show logout confirmation dialog
+        _uiState.update { it.copy(showLogoutDialog = true) }
+    }
+
+    /**
+     * Confirm logout - actually perform the logout
+     */
+    fun onConfirmLogout() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            // TODO: Clear user session and navigate to auth
-            _uiState.update { it.copy(isLoading = false) }
+            println("🚪 ProfileViewModel: Logging out user...")
+            _uiState.update { it.copy(showLogoutDialog = false, isLoading = true) }
+
+            try {
+                // Clear user session
+                sessionManager.clearSession()
+                println("✅ ProfileViewModel: Session cleared successfully")
+
+                // Trigger navigation to auth screen
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        shouldNavigateToAuth = true
+                    )
+                }
+            } catch (e: Exception) {
+                println("❌ ProfileViewModel: Logout failed - ${e.message}")
+                e.printStackTrace()
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Failed to logout: ${e.message}"
+                    )
+                }
+            }
         }
+    }
+
+    /**
+     * Dismiss logout dialog
+     */
+    fun onDismissLogoutDialog() {
+        _uiState.update { it.copy(showLogoutDialog = false) }
+    }
+
+    /**
+     * Reset navigation flag after navigation is handled
+     */
+    fun onLogoutNavigationHandled() {
+        _uiState.update { it.copy(shouldNavigateToAuth = false) }
     }
     
     /**

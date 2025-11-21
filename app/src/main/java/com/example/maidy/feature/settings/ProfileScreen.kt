@@ -17,11 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.maidy.core.components.ConfirmationDialog
 import com.example.maidy.feature.settings.components.*
 import com.example.maidy.ui.theme.ProfileScreenBackground
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.ui.graphics.Color
 
 /**
  * Profile/Settings Screen
@@ -31,6 +33,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel = koinViewModel(),
+    onNavigateToAuth: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -69,12 +72,35 @@ fun ProfileScreen(
     LaunchedEffect(Unit) {
         viewModel.loadUserProfile()
     }
+
+    // Handle logout navigation
+    LaunchedEffect(uiState.shouldNavigateToAuth) {
+        if (uiState.shouldNavigateToAuth) {
+            onNavigateToAuth()
+            viewModel.onLogoutNavigationHandled()
+        }
+    }
     
     ProfileScreenContent(
         uiState = uiState,
         onEditProfileImageClick = onEditProfileImage,
         onEvent = viewModel::onEvent,
         modifier = modifier
+    )
+
+    // Logout Confirmation Dialog
+    ConfirmationDialog(
+        isVisible = uiState.showLogoutDialog,
+        icon = Icons.AutoMirrored.Outlined.ExitToApp,
+        iconBackgroundColor = Color(0xFFFCE7E7),
+        iconTint = Color(0xFFDC2626),
+        title = "Log Out?",
+        description = "Are you sure you want to log out? You'll need to log in again to access your account.",
+        confirmButtonText = "Yes, Log Out",
+        confirmButtonColor = Color(0xFFDC2626),
+        cancelButtonText = "Go Back",
+        onConfirm = viewModel::onConfirmLogout,
+        onDismiss = viewModel::onDismissLogoutDialog
     )
 }
 
@@ -147,39 +173,9 @@ private fun ProfileScreenContent(
             title = uiState.selectedLanguage,
             onClick = { onEvent(ProfileEvent.UpdateLanguage("English")) }
         )
-        
-        Spacer(modifier = Modifier.height(32.dp))
-        
-        // History & Support Section
-        SettingSectionHeader(title = "History & Support")
-        
-        // Booking History
-        SettingNavigationItem(
-            icon = Icons.Outlined.AddCircle,
-            title = "Booking History",
-            onClick = { onEvent(ProfileEvent.NavigateToBookingHistory) }
-        )
-        
+
         Spacer(modifier = Modifier.height(12.dp))
-        
-        // Payment History
-        SettingNavigationItem(
-            icon = Icons.Outlined.Check,
-            title = "Payment History",
-            onClick = { onEvent(ProfileEvent.NavigateToPaymentHistory) }
-        )
-        
-        Spacer(modifier = Modifier.height(12.dp))
-        
-        // Help & Support
-        SettingNavigationItem(
-            icon = Icons.AutoMirrored.Outlined.ExitToApp,
-            title = "Help & Support",
-            onClick = { onEvent(ProfileEvent.NavigateToHelpSupport) }
-        )
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
+
         // Log Out Button
         LogOutButton(
             onClick = { onEvent(ProfileEvent.LogOut) }

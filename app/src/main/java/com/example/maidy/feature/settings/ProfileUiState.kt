@@ -12,7 +12,9 @@ data class ProfileUiState(
     val areNotificationsEnabled: Boolean = true,
     val selectedLanguage: String = "English",
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val shouldNavigateToAuth: Boolean = false,
+    val showLogoutDialog: Boolean = false
 )
 
 /**

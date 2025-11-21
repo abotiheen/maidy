@@ -9,6 +9,7 @@ import com.example.maidy.core.util.ImageCompressor
 import com.example.maidy.feature.admin.AdminAddMaidViewModel
 import com.example.maidy.feature.adjust_recurring.AdjustRecurringViewModel
 import com.example.maidy.feature.auth.AuthViewModel
+import com.example.maidy.feature.rating.RatingViewModel
 import com.example.maidy.feature.booking.BookingStatusViewModel
 import com.example.maidy.feature.booking_details.BookingDetailsViewModel
 import com.example.maidy.feature.home.HomeViewModel
@@ -50,4 +51,5 @@ val appModule = module {
     viewModel { (maidId: String) -> BookingDetailsViewModel(maidId, get(), get(), get(), get()) }
     viewModel { (bookingId: String) -> BookingStatusViewModel(bookingId, get(), get()) }
     viewModel { (bookingId: String) -> AdjustRecurringViewModel(bookingId, get(), get()) }
+    viewModel { (bookingId: String) -> RatingViewModel(bookingId, get(), get(), get(), get()) }
 }
