@@ -136,25 +136,26 @@ fun HomeScreenPreview() {
                         id = "1",
                         serviceName = "Deep Cleaning",
                         maidName = "Maria G.",
-                        date = "Tomorrow",
-                        time = "10:00 AM",
-                        status = BookingStatus.CONFIRMED
+                        dateTime = "Nov 25, 2024 at 10:00 AM",
+                        status = BookingStatus.CONFIRMED,
+                        profileImageUrl = ""
                     ),
                     BookingItem(
                         id = "2",
-                        serviceName = "Standard Home Clean",
+                        serviceName = "Standard Cleaning",
                         maidName = "Jessica L.",
-                        date = "Today",
-                        time = "2:00 PM",
-                        status = BookingStatus.IN_PROGRESS
+                        dateTime = "Nov 21, 2024 at 2:00 PM",
+                        status = BookingStatus.IN_PROGRESS,
+                        profileImageUrl = "",
+                        isRecurring = true
                     ),
                     BookingItem(
                         id = "3",
                         serviceName = "Move-out Clean",
                         maidName = "Ana P.",
-                        date = "Oct 28",
-                        time = "9:00 AM",
-                        status = BookingStatus.COMPLETED
+                        dateTime = "Nov 28, 2024 at 9:00 AM",
+                        status = BookingStatus.ON_THE_WAY,
+                        profileImageUrl = ""
                     )
                 )
             ),

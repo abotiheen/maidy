@@ -2,8 +2,11 @@ package com.example.maidy.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.maidy.core.data.BookingRepository
 import com.example.maidy.core.data.SessionManager
 import com.example.maidy.core.data.UserRepository
+import com.example.maidy.core.model.Booking
+import com.example.maidy.core.util.BookingDateUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,16 +17,19 @@ data class BookingItem(
     val id: String,
     val serviceName: String,
     val maidName: String,
-    val date: String,
-    val time: String,
+    val dateTime: String,  // Formatted as "Nov 21, 2024 at 10:00 AM"
     val status: BookingStatus,
-    val profileImageUrl: String = "" // Placeholder
+    val profileImageUrl: String = "",
+    val isRecurring: Boolean = false
 )
 
 enum class BookingStatus {
+    PENDING,
     CONFIRMED,
+    ON_THE_WAY,
     IN_PROGRESS,
-    COMPLETED
+    COMPLETED,
+    CANCELLED
 }
 
 data class HomeUiState(
@@ -46,6 +52,7 @@ sealed class HomeUiEvent {
 
 class HomeViewModel(
     private val userRepository: UserRepository,
+    private val bookingRepository: BookingRepository,
     private val sessionManager: SessionManager
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -53,7 +60,7 @@ class HomeViewModel(
 
     init {
         loadUserData()
-        loadPlaceholderData()
+        loadBookings()
     }
 
     fun onEvent(event: HomeUiEvent) {
@@ -131,39 +138,106 @@ class HomeViewModel(
         }
     }
 
-    private fun loadPlaceholderData() {
-        // Placeholder data - will be replaced with API calls
-        _uiState.update {
-            it.copy(
-                hasNotifications = true,
-                recentBookings = listOf(
-                    BookingItem(
-                        id = "1",
-                        serviceName = "Deep Cleaning",
-                        maidName = "Maria G.",
-                        date = "Tomorrow",
-                        time = "10:00 AM",
-                        status = BookingStatus.CONFIRMED
-                    ),
-                    BookingItem(
-                        id = "2",
-                        serviceName = "Standard Home Clean",
-                        maidName = "Jessica L.",
-                        date = "Today",
-                        time = "2:00 PM",
-                        status = BookingStatus.IN_PROGRESS
-                    ),
-                    BookingItem(
-                        id = "3",
-                        serviceName = "Move-out Clean",
-                        maidName = "Ana P.",
-                        date = "Oct 28",
-                        time = "9:00 AM",
-                        status = BookingStatus.COMPLETED
+    private fun loadBookings() {
+        viewModelScope.launch {
+            println("🟢 HomeViewModel: Loading bookings...")
+            _uiState.update { it.copy(isLoading = true) }
+            
+            val userId = sessionManager.getCurrentUserId()
+            
+            if (userId == null) {
+                println("❌ HomeViewModel: User not logged in, no bookings to load")
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        recentBookings = emptyList()
                     )
-                )
-            )
+                }
+                return@launch
+            }
+            
+            try {
+                val result = bookingRepository.getActiveUserBookings(userId)
+                
+                if (result.isSuccess) {
+                    val bookings = result.getOrNull()!!
+                    println("✅ HomeViewModel: Loaded ${bookings.size} bookings")
+                    
+                    val bookingItems = bookings.map { booking ->
+                        mapBookingToItem(booking)
+                    }
+                    
+                    _uiState.update { 
+                        it.copy(
+                            recentBookings = bookingItems,
+                            isLoading = false
+                        )
+                    }
+                } else {
+                    val error = result.exceptionOrNull()?.message
+                    println("❌ HomeViewModel: Failed to load bookings: $error")
+                    _uiState.update { 
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                println("❌ HomeViewModel: Exception loading bookings: ${e.message}")
+                e.printStackTrace()
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = e.message
+                    )
+                }
+            }
         }
+    }
+    
+    /**
+     * Map Firebase Booking model to UI BookingItem
+     */
+    private fun mapBookingToItem(booking: Booking): BookingItem {
+        val time = BookingDateUtils.getBookingTime(booking)
+        val formattedDateTime = BookingDateUtils.formatBookingDateTime(
+            date = booking.nextScheduledDate,
+            time = time
+        )
+        
+        return BookingItem(
+            id = booking.id,
+            serviceName = booking.bookingType.displayName(),
+            maidName = booking.maidFullName,
+            dateTime = formattedDateTime,
+            status = mapFirebaseStatusToUiStatus(booking.status),
+            profileImageUrl = booking.maidProfileImageUrl,
+            isRecurring = booking.isRecurring
+        )
+    }
+    
+    /**
+     * Map Firebase BookingStatus to UI BookingStatus
+     */
+    private fun mapFirebaseStatusToUiStatus(
+        firebaseStatus: com.example.maidy.core.model.BookingStatus
+    ): BookingStatus {
+        return when (firebaseStatus) {
+            com.example.maidy.core.model.BookingStatus.PENDING -> BookingStatus.PENDING
+            com.example.maidy.core.model.BookingStatus.CONFIRMED -> BookingStatus.CONFIRMED
+            com.example.maidy.core.model.BookingStatus.ON_THE_WAY -> BookingStatus.ON_THE_WAY
+            com.example.maidy.core.model.BookingStatus.IN_PROGRESS -> BookingStatus.IN_PROGRESS
+            com.example.maidy.core.model.BookingStatus.COMPLETED -> BookingStatus.COMPLETED
+            com.example.maidy.core.model.BookingStatus.CANCELLED -> BookingStatus.CANCELLED
+        }
+    }
+    
+    /**
+     * Refresh bookings (can be called when user pulls to refresh)
+     */
+    fun refreshBookings() {
+        loadBookings()
     }
 }
 

@@ -1,6 +1,8 @@
 package com.example.maidy.core.data
 
 import com.example.maidy.core.model.Booking
+import com.example.maidy.core.model.BookingStatus
+import com.example.maidy.core.util.BookingDateUtils
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -14,6 +16,7 @@ class BookingRepository(
     
     /**
      * Create a new booking in Firestore
+     * Automatically calculates nextScheduledDate based on booking type
      */
     suspend fun createBooking(booking: Booking): Result<String> {
         return try {
@@ -21,16 +24,22 @@ class BookingRepository(
             println("📝 BookingRepository: Booking type - ${booking.bookingType}")
             println("📝 BookingRepository: Is recurring - ${booking.isRecurring}")
             
-            val bookingWithTimestamp = booking.copy(
+            // Calculate nextScheduledDate if not already set
+            val nextScheduledDate = booking.nextScheduledDate 
+                ?: BookingDateUtils.calculateNextScheduledDate(booking)
+            
+            val bookingWithSchedule = booking.copy(
+                nextScheduledDate = nextScheduledDate,
                 updatedAt = Timestamp.now()
             )
             
             firestore.collection("bookings")
                 .document(booking.id)
-                .set(bookingWithTimestamp)
+                .set(bookingWithSchedule)
                 .await()
                 
             println("✅ BookingRepository: Booking created successfully - ID: ${booking.id}")
+            println("✅ BookingRepository: Next scheduled date - ${nextScheduledDate?.toDate()}")
             Result.success(booking.id)
         } catch (e: Exception) {
             println("❌ BookingRepository: Failed to create booking - ${e.message}")
@@ -159,6 +168,105 @@ class BookingRepository(
             Result.success(Unit)
         } catch (e: Exception) {
             println("❌ BookingRepository: Failed to update special instructions - ${e.message}")
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+    
+    /**
+     * Complete a booking and handle recurring logic
+     * - For one-time bookings: just marks as completed
+     * - For recurring bookings: calculates next date, resets status to CONFIRMED
+     */
+    suspend fun completeBooking(bookingId: String): Result<Unit> {
+        return try {
+            println("📝 BookingRepository: Completing booking - ID: $bookingId")
+            
+            // First, fetch the booking to check if it's recurring
+            val bookingResult = getBookingById(bookingId)
+            if (bookingResult.isFailure) {
+                return Result.failure(bookingResult.exceptionOrNull()!!)
+            }
+            
+            val booking = bookingResult.getOrNull()!!
+            
+            if (booking.isRecurring) {
+                // For recurring bookings: calculate next date and reset to CONFIRMED
+                val nextDate = BookingDateUtils.calculateNextRecurringDate(
+                    preferredDay = booking.preferredDay,
+                    recurringType = booking.recurringType!!,
+                    fromDate = booking.nextScheduledDate // Calculate from current scheduled date
+                )
+                
+                firestore.collection("bookings")
+                    .document(bookingId)
+                    .update(
+                        mapOf(
+                            "status" to BookingStatus.CONFIRMED.name,
+                            "lastCompletedDate" to Timestamp.now(),
+                            "nextScheduledDate" to nextDate,
+                            "updatedAt" to Timestamp.now()
+                        )
+                    )
+                    .await()
+                    
+                println("✅ BookingRepository: Recurring booking completed and rescheduled to ${nextDate.toDate()}")
+            } else {
+                // For one-time bookings: just mark as completed
+                firestore.collection("bookings")
+                    .document(bookingId)
+                    .update(
+                        mapOf(
+                            "status" to BookingStatus.COMPLETED.name,
+                            "updatedAt" to Timestamp.now()
+                        )
+                    )
+                    .await()
+                    
+                println("✅ BookingRepository: One-time booking marked as completed")
+            }
+            
+            Result.success(Unit)
+        } catch (e: Exception) {
+            println("❌ BookingRepository: Failed to complete booking - ${e.message}")
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+    
+    /**
+     * Get active bookings for a user (not completed/cancelled, or recurring with future dates)
+     * Sorted by next scheduled date
+     */
+    suspend fun getActiveUserBookings(userId: String): Result<List<Booking>> {
+        return try {
+            println("📖 BookingRepository: Fetching active bookings for user - ID: $userId")
+            
+            // Fetch all bookings for user (without orderBy to avoid requiring composite index)
+            val snapshot = firestore.collection("bookings")
+                .whereEqualTo("userId", userId)
+                .get()
+                .await()
+            
+            val now = Timestamp.now()
+            val bookings = snapshot.documents
+                .mapNotNull { it.toObject(Booking::class.java) }
+                .filter { booking ->
+                    // Include booking if:
+                    // 1. Status is not COMPLETED or CANCELLED
+                    // 2. AND next scheduled date is not in the past
+                    val isActive = booking.status != BookingStatus.COMPLETED && 
+                                   booking.status != BookingStatus.CANCELLED
+                    val hasFutureDate = booking.nextScheduledDate?.let { it >= now } ?: false
+                    
+                    isActive && hasFutureDate
+                }
+                .sortedBy { it.nextScheduledDate } // Sort in-memory after filtering
+            
+            println("✅ BookingRepository: Found ${bookings.size} active bookings")
+            Result.success(bookings)
+        } catch (e: Exception) {
+            println("❌ BookingRepository: Failed to fetch active user bookings - ${e.message}")
             e.printStackTrace()
             Result.failure(e)
         }

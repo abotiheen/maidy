@@ -16,7 +16,7 @@ fun RecentBookingsSectionHeader(
     modifier: Modifier = Modifier
 ) {
     Text(
-        text = "Your Recent Bookings",
+        text = "Your Upcoming Bookings",
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
         color = HomeSectionTitle,

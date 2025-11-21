@@ -40,6 +40,9 @@ fun BookingStatusScreen(
             statusMessage = uiState.statusMessage,
             currentStatus = uiState.currentStatus
         )
+
+        // Recurring Card
+        RecurringCard(onManageBooking = { /* TODO */ })
         
         // Action Button
         StatusActionButton(
@@ -92,4 +95,3 @@ fun BookingStatusScreenCompletedPreview() {
     viewModel.updateStatus(BookingStatus.COMPLETED)
     BookingStatusScreen(viewModel = viewModel)
 }
-

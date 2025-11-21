@@ -4,18 +4,26 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.maidy.feature.home.BookingItem
 import com.example.maidy.feature.home.BookingStatus
 import com.example.maidy.ui.theme.*
@@ -42,14 +50,30 @@ fun BookingCard(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Profile Image Placeholder
+        // Maid Profile Image
         Box(
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape)
-                .background(Color.LightGray)
+                .background(Color.LightGray),
+            contentAlignment = Alignment.Center
         ) {
-            // TODO: Load actual image when API is connected
+            if (booking.profileImageUrl.isNotEmpty()) {
+                AsyncImage(
+                    model = booking.profileImageUrl,
+                    contentDescription = "Maid profile picture",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                // Placeholder icon when no image
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -58,18 +82,41 @@ fun BookingCard(
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(
-                text = booking.serviceName,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = HomeBookingTitle
-            )
+            // Service name with recurring badge
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = booking.serviceName,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = HomeBookingTitle
+                )
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = booking.maidName,
+                    fontSize = 14.sp,
+                    color = HomeBookingDetails,
+                    fontWeight = FontWeight.Medium
+                )
+                if (booking.isRecurring) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    RecurringBadge()
+                }
+            }
+
+            Spacer(modifier = Modifier.height(2.dp))
+
             Text(
-                text = "${booking.maidName} • ${booking.date}, ${booking.time}",
-                fontSize = 14.sp,
+                text = booking.dateTime,
+                fontSize = 13.sp,
                 color = HomeBookingDetails
             )
         }
@@ -82,25 +129,69 @@ fun BookingCard(
 }
 
 @Composable
+private fun RecurringBadge(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .background(
+                color = HomeNotificationBadge,
+                shape = CircleShape
+            )
+            .padding(horizontal = 6.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = "Recurring",
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.White,
+            style = TextStyle(
+                platformStyle = PlatformTextStyle(
+                    includeFontPadding = false
+                )
+            )
+        )
+    }
+}
+
+@Composable
 private fun BookingStatusBadge(
     status: BookingStatus,
     modifier: Modifier = Modifier
 ) {
     val (statusText, textColor, backgroundColor) = when (status) {
+        BookingStatus.PENDING -> Triple(
+            "Pending",
+            HomeStatusInProgress,
+            HomeStatusInProgressBg
+        )
+
         BookingStatus.CONFIRMED -> Triple(
             "Confirmed",
             HomeStatusConfirmed,
             HomeStatusConfirmedBg
         )
+
+        BookingStatus.ON_THE_WAY -> Triple(
+            "On the Way",
+            HomeStatusInProgress,
+            HomeStatusInProgressBg
+        )
+
         BookingStatus.IN_PROGRESS -> Triple(
             "In Progress",
             HomeStatusInProgress,
             HomeStatusInProgressBg
         )
+
         BookingStatus.COMPLETED -> Triple(
             "Completed",
             HomeStatusCompleted,
             HomeStatusCompletedBg
+        )
+
+        BookingStatus.CANCELLED -> Triple(
+            "Cancelled",
+            Color.Gray,
+            Color.LightGray.copy(alpha = 0.3f)
         )
     }
 
@@ -130,9 +221,9 @@ fun BookingCardConfirmedPreview() {
                 id = "1",
                 serviceName = "Deep Cleaning",
                 maidName = "Maria G.",
-                date = "Tomorrow",
-                time = "10:00 AM",
-                status = BookingStatus.CONFIRMED
+                dateTime = "Nov 25, 2024 at 10:00 AM",
+                status = BookingStatus.CONFIRMED,
+                profileImageUrl = ""
             ),
             onClick = {}
         )
@@ -141,16 +232,17 @@ fun BookingCardConfirmedPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun BookingCardInProgressPreview() {
+fun BookingCardRecurringPreview() {
     MaidyTheme {
         BookingCard(
             booking = BookingItem(
                 id = "2",
-                serviceName = "Standard Home Clean",
+                serviceName = "Standard Cleaning",
                 maidName = "Jessica L.",
-                date = "Today",
-                time = "2:00 PM",
-                status = BookingStatus.IN_PROGRESS
+                dateTime = "Nov 21, 2024 at 2:00 PM",
+                status = BookingStatus.IN_PROGRESS,
+                profileImageUrl = "",
+                isRecurring = true
             ),
             onClick = {}
         )
@@ -159,16 +251,16 @@ fun BookingCardInProgressPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun BookingCardCompletedPreview() {
+fun BookingCardOnTheWayPreview() {
     MaidyTheme {
         BookingCard(
             booking = BookingItem(
                 id = "3",
                 serviceName = "Move-out Clean",
                 maidName = "Ana P.",
-                date = "Oct 28",
-                time = "9:00 AM",
-                status = BookingStatus.COMPLETED
+                dateTime = "Nov 21, 2024 at 9:00 AM",
+                status = BookingStatus.ON_THE_WAY,
+                profileImageUrl = ""
             ),
             onClick = {}
         )
