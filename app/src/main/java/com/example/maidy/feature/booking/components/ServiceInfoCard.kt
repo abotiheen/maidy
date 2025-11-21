@@ -13,12 +13,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.maidy.feature.booking.BookingDetails
+import com.example.maidy.feature.booking.BookingServiceDetails
 import com.example.maidy.ui.theme.*
 
 @Composable
 fun ServiceInfoCard(
-    bookingDetails: BookingDetails,
+    bookingDetails: BookingServiceDetails,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -89,7 +89,7 @@ fun ServiceInfoCardPreview() {
             .padding(16.dp)
     ) {
         ServiceInfoCard(
-            bookingDetails = BookingDetails(
+            bookingDetails = BookingServiceDetails(
                 service = "Standard Cleaning",
                 date = "Nov 18, 2023",
                 time = "10:00 AM"
@@ -97,7 +97,6 @@ fun ServiceInfoCardPreview() {
         )
     }
 }
-
 
 
 

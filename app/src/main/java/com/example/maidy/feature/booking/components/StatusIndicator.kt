@@ -13,10 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.maidy.feature.booking.BookingStatus
+import com.example.maidy.core.model.BookingStatus
 import com.example.maidy.ui.theme.*
 
 @Composable
@@ -24,75 +25,75 @@ fun StatusIndicator(
     currentStatus: BookingStatus,
     modifier: Modifier = Modifier
 ) {
+    val statusSteps = listOf(
+        BookingStatus.PENDING,
+        BookingStatus.CONFIRMED,
+        BookingStatus.ON_THE_WAY,
+        BookingStatus.IN_PROGRESS,
+        BookingStatus.COMPLETED
+    )
+    val currentIndex = statusSteps.indexOf(currentStatus).coerceAtLeast(0)
+    
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
-        // Confirmed
-        StatusStep(
-            label = "Confirmed",
-            isActive = currentStatus == BookingStatus.CONFIRMED,
-            isCompleted = currentStatus.ordinal >= BookingStatus.CONFIRMED.ordinal,
-            activeColor = BookingStatusConfirmedIcon,
-            modifier = Modifier.weight(1f)
-        )
-        
-        // Connecting Line
-        StatusLine(
-            isCompleted = currentStatus.ordinal >= BookingStatus.ON_THE_WAY.ordinal
-        )
-        
-        // On the Way
-        StatusStep(
-            label = "On the Way",
-            isActive = currentStatus == BookingStatus.ON_THE_WAY,
-            isCompleted = currentStatus.ordinal >= BookingStatus.ON_THE_WAY.ordinal,
-            activeColor = BookingStatusOnWayIcon,
-            modifier = Modifier.weight(1f)
-        )
-        
-        // Connecting Line
-        StatusLine(
-            isCompleted = currentStatus.ordinal >= BookingStatus.IN_PROGRESS.ordinal
-        )
-        
-        // In Progress
-        StatusStep(
-            label = "In Progress",
-            isActive = currentStatus == BookingStatus.IN_PROGRESS,
-            isCompleted = currentStatus.ordinal >= BookingStatus.IN_PROGRESS.ordinal,
-            activeColor = BookingStatusInProgressIcon,
-            modifier = Modifier.weight(1f)
-        )
-        
-        // Connecting Line
-        StatusLine(
-            isCompleted = currentStatus == BookingStatus.COMPLETED
-        )
-        
-        // Completed
-        StatusStep(
-            label = "Completed",
-            isActive = currentStatus == BookingStatus.COMPLETED,
-            isCompleted = currentStatus == BookingStatus.COMPLETED,
-            activeColor = BookingStatusCompletedIcon,
-            modifier = Modifier.weight(1f)
-        )
+        statusSteps.forEachIndexed { index, status ->
+            StatusStep(
+                label = statusLabel(status),
+                isActive = index == currentIndex,
+                isCompleted = currentIndex > index,
+                activeColor = statusColor(status),
+                modifier = Modifier.weight(1f)
+            )
+            
+            if (index < statusSteps.lastIndex) {
+                StatusLine(
+                    isCompleted = currentIndex > index,
+                    color = statusColor(statusSteps[index + 1]),
+                    modifier = Modifier
+                        .weight(0.5f)
+                        .padding(top = 11.dp)
+                )
+            }
+        }
+    }
+}
+
+private fun statusLabel(status: BookingStatus): String {
+    return when (status) {
+        BookingStatus.PENDING -> "Pending"
+        BookingStatus.CONFIRMED -> "Confirmed"
+        BookingStatus.ON_THE_WAY -> "On Way"
+        BookingStatus.IN_PROGRESS -> "Progress"
+        BookingStatus.COMPLETED -> "Completed"
+        BookingStatus.CANCELLED -> "Cancelled"
+    }
+}
+
+private fun statusColor(status: BookingStatus): Color {
+    return when (status) {
+        BookingStatus.PENDING -> BookingStatusPendingIcon
+        BookingStatus.CONFIRMED -> BookingStatusConfirmedIcon
+        BookingStatus.ON_THE_WAY -> BookingStatusOnWayIcon
+        BookingStatus.IN_PROGRESS -> BookingStatusInProgressIcon
+        BookingStatus.COMPLETED -> BookingStatusCompletedIcon
+        BookingStatus.CANCELLED -> BookingStatusInactiveIcon
     }
 }
 
 @Composable
 fun StatusLine(
     isCompleted: Boolean,
+    color: Color = BookingStatusOnWayIcon,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
-            .width(24.dp)
             .height(2.dp)
             .background(
-                if (isCompleted) BookingStatusOnWayIcon
+                if (isCompleted) color
                 else BookingStatusInactiveIcon
             )
     )
@@ -108,11 +109,12 @@ fun StatusStep(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        modifier = modifier,
+        verticalArrangement = Arrangement.Top
     ) {
         Box(
             modifier = Modifier
-                .size(36.dp)
+                .size(24.dp)
                 .clip(CircleShape)
                 .background(
                     if (isActive || isCompleted) activeColor
@@ -125,25 +127,27 @@ fun StatusStep(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Completed",
                     tint = Color.White,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(16.dp)
                 )
             } else if (isActive) {
                 Box(
                     modifier = Modifier
-                        .size(16.dp)
+                        .size(10.dp)
                         .clip(CircleShape)
                         .background(Color.White)
                 )
             }
         }
         
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         
         Text(
             text = label,
-            fontSize = 12.sp,
+            fontSize = 10.sp,
             fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-            color = if (isActive) activeColor else BookingStatusInactiveIcon
+            color = if (isActive || isCompleted) activeColor else BookingStatusInactiveIcon,
+            textAlign = TextAlign.Center,
+            lineHeight = 12.sp
         )
     }
 }
@@ -157,6 +161,9 @@ fun StatusIndicatorPreview() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        Text("Pending Status", fontWeight = FontWeight.Bold)
+        StatusIndicator(currentStatus = BookingStatus.PENDING)
+        
         Text("Confirmed Status", fontWeight = FontWeight.Bold)
         StatusIndicator(currentStatus = BookingStatus.CONFIRMED)
         
@@ -170,4 +177,3 @@ fun StatusIndicatorPreview() {
         StatusIndicator(currentStatus = BookingStatus.COMPLETED)
     }
 }
-

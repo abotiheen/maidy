@@ -59,7 +59,9 @@ sealed class Screen(
     /**
      * Emergency/SOS screen - emergency help button
      */
-    data object Emergency : Screen("emergency", "Emergency")
+    data object Emergency : Screen("emergency", "Emergency",
+        showTopBar = false,
+        showBottomBar = false)
     
     /**
      * Notifications screen - view user notifications
@@ -92,6 +94,16 @@ sealed class Screen(
      * Admin Add Maid screen - for populating Firebase with maid data
      */
     data object AdminAddMaid : Screen("admin_add_maid", "Add Maid")
+
+    /**
+     * Adjust Recurring Booking screen - manage recurring booking settings
+     * Route includes bookingId parameter: adjust_recurring/{bookingId}
+     */
+    data object AdjustRecurring : Screen("adjust_recurring/{bookingId}", "Edit Recurring Booking") {
+        fun createRoute(bookingId: String): String {
+            return "adjust_recurring/$bookingId"
+        }
+    }
 }
 
 /**
@@ -106,6 +118,7 @@ fun getScreenFromRoute(route: String?): Screen {
         route.startsWith("maid_profile") -> Screen.MaidProfile
         route.startsWith("booking_details") -> Screen.BookingDetails
         route.startsWith("booking_status") -> Screen.BookingStatus
+        route.startsWith("adjust_recurring") -> Screen.AdjustRecurring
         route.startsWith("emergency") -> Screen.Emergency
         route.startsWith("notifications") -> Screen.Notifications
         route.startsWith("rating") -> Screen.Rating

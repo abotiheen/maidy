@@ -160,38 +160,38 @@ private fun BookingStatusBadge(
     val (statusText, textColor, backgroundColor) = when (status) {
         BookingStatus.PENDING -> Triple(
             "Pending",
-            HomeStatusInProgress,
-            HomeStatusInProgressBg
+            BookingStatusPendingIcon,
+            BookingStatusPendingIcon.copy(alpha = 0.15f)
         )
 
         BookingStatus.CONFIRMED -> Triple(
             "Confirmed",
-            HomeStatusConfirmed,
-            HomeStatusConfirmedBg
+            BookingStatusConfirmedIcon,
+            BookingStatusConfirmedIcon.copy(alpha = 0.15f)
         )
 
         BookingStatus.ON_THE_WAY -> Triple(
             "On the Way",
-            HomeStatusInProgress,
-            HomeStatusInProgressBg
+            BookingStatusOnWayIcon,
+            BookingStatusOnWayIcon.copy(alpha = 0.15f)
         )
 
         BookingStatus.IN_PROGRESS -> Triple(
             "In Progress",
-            HomeStatusInProgress,
-            HomeStatusInProgressBg
+            BookingStatusInProgressIcon,
+            BookingStatusInProgressIcon.copy(alpha = 0.15f)
         )
 
         BookingStatus.COMPLETED -> Triple(
             "Completed",
-            HomeStatusCompleted,
-            HomeStatusCompletedBg
+            BookingStatusCompletedIcon,
+            BookingStatusCompletedIcon.copy(alpha = 0.15f)
         )
 
         BookingStatus.CANCELLED -> Triple(
             "Cancelled",
-            Color.Gray,
-            Color.LightGray.copy(alpha = 0.3f)
+            BookingStatusInactiveIcon,
+            BookingStatusInactiveIcon.copy(alpha = 0.3f)
         )
     }
 

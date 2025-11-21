@@ -1,5 +1,7 @@
 package com.example.maidy.feature.sos
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,10 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -27,16 +31,26 @@ import com.example.maidy.ui.theme.MaidyTheme
 @Composable
 fun EmergencyScreen(
     viewModel: EmergencyViewModel = viewModel(),
-    onNavigateBack: () -> Unit = {},
-    onEmergencyConfirmed: () -> Unit = {}
+    onNavigateBack: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    // Handle dialer opening
+    LaunchedEffect(uiState.shouldOpenDialer) {
+        uiState.shouldOpenDialer?.let { phoneNumber ->
+            val intent = Intent(Intent.ACTION_DIAL).apply {
+                data = Uri.parse("tel:$phoneNumber")
+            }
+            context.startActivity(intent)
+            viewModel.onDialerHandled()
+        }
+    }
 
     EmergencyScreenContent(
         uiState = uiState,
         onCallForHelpClick = {
             viewModel.onEvent(EmergencyUiEvent.OnCallForHelpClick)
-            onEmergencyConfirmed()
         },
         onCancelClick = {
             viewModel.onEvent(EmergencyUiEvent.OnCancelClick)

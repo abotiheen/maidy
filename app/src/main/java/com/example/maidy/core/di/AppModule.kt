@@ -7,7 +7,9 @@ import com.example.maidy.core.data.SessionManager
 import com.example.maidy.core.data.UserRepository
 import com.example.maidy.core.util.ImageCompressor
 import com.example.maidy.feature.admin.AdminAddMaidViewModel
+import com.example.maidy.feature.adjust_recurring.AdjustRecurringViewModel
 import com.example.maidy.feature.auth.AuthViewModel
+import com.example.maidy.feature.booking.BookingStatusViewModel
 import com.example.maidy.feature.booking_details.BookingDetailsViewModel
 import com.example.maidy.feature.home.HomeViewModel
 import com.example.maidy.feature.maid_details.MaidProfileViewModel
@@ -46,4 +48,6 @@ val appModule = module {
     viewModel { MaidListViewModel(get()) }
     viewModel { MaidProfileViewModel(get()) }
     viewModel { (maidId: String) -> BookingDetailsViewModel(maidId, get(), get(), get(), get()) }
+    viewModel { (bookingId: String) -> BookingStatusViewModel(bookingId, get(), get()) }
+    viewModel { (bookingId: String) -> AdjustRecurringViewModel(bookingId, get(), get()) }
 }

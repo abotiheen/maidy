@@ -20,6 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.maidy.R
 import com.example.maidy.feature.admin.AdminAddMaidScreen
+import com.example.maidy.feature.adjust_recurring.AdjustRecurringScreen
 import com.example.maidy.feature.auth.AuthScreen
 import com.example.maidy.feature.booking.BookingStatusScreen
 import com.example.maidy.feature.booking_details.BookingDetailsScreen
@@ -130,6 +131,9 @@ fun MaidyNavHost(
                 },
                 onNavigateToAdmin = {
                     navController.navigate(Screen.AdminAddMaid.route)
+                },
+                onNavigateToBookingDetails = { bookingId ->
+                    navController.navigate(Screen.BookingStatus.createRoute(bookingId))
                 }
             )
         }
@@ -199,12 +203,43 @@ fun MaidyNavHost(
                 }
             )
         ) {
-            BookingStatusScreen()
+            val bookingId = it.arguments?.getString("bookingId").orEmpty()
+            BookingStatusScreen(
+                bookingId = bookingId,
+                onNavigateToSOS = {
+                    navController.navigate(Screen.Emergency.route)
+                },
+                onNavigateToAdjustRecurring = {
+                    navController.navigate(Screen.AdjustRecurring.createRoute(bookingId))
+                }
+            )
         }
-        
-        // Emergency Screen - SOS/Emergency Help
-        composable(route = Screen.Emergency.route) {
-            EmergencyScreen()
+
+            // Adjust Recurring Booking Screen - Manage Recurring Booking
+            composable(
+                route = Screen.AdjustRecurring.route,
+                arguments = listOf(
+                    navArgument("bookingId") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                val bookingId = it.arguments?.getString("bookingId").orEmpty()
+                AdjustRecurringScreen(
+                    bookingId = bookingId,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                }
+            )
+        }
+
+            // Emergency Screen - SOS/Emergency Help
+            composable(route = Screen.Emergency.route) {
+                EmergencyScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
         }
         
         // Notifications Screen - View User Notifications
@@ -249,4 +284,3 @@ fun MaidyNavHost(
         }
     }
 }
-

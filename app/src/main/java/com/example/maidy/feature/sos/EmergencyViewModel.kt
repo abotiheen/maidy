@@ -9,9 +9,10 @@ import kotlinx.coroutines.flow.update
 data class EmergencyUiState(
     val showConfirmationDialog: Boolean = false,
     val isEmergencyTriggered: Boolean = false,
-    val emergencyContactNumber: String = "911", // Placeholder
+    val emergencyContactNumber: String = "911",
     val userLocation: String = "", // Placeholder for location data
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val shouldOpenDialer: String? = null // Phone number to dial, null when not needed
 )
 
 sealed class EmergencyUiEvent {
@@ -28,22 +29,29 @@ class EmergencyViewModel : ViewModel() {
     fun onEvent(event: EmergencyUiEvent) {
         when (event) {
             is EmergencyUiEvent.OnCallForHelpClick -> {
-                // This will trigger emergency services
-                // In a real app, this would make an API call, send location, and initiate emergency protocol
-                triggerEmergency()
+                // Open dialer with emergency number (911)
+                val emergencyNumber = _uiState.value.emergencyContactNumber
+                _uiState.update { it.copy(shouldOpenDialer = emergencyNumber) }
             }
+
             is EmergencyUiEvent.OnCancelClick -> {
                 // Cancel and go back to previous screen
-                // TODO: Navigation will be handled by the screen
+                // Navigation will be handled by the screen
                 _uiState.update { it.copy(showConfirmationDialog = false) }
             }
+
             is EmergencyUiEvent.OnConfirmEmergency -> {
                 _uiState.update { it.copy(showConfirmationDialog = true) }
             }
+
             is EmergencyUiEvent.OnDismissError -> {
                 _uiState.update { it.copy(errorMessage = null) }
             }
         }
+    }
+
+    fun onDialerHandled() {
+        _uiState.update { it.copy(shouldOpenDialer = null) }
     }
 
     private fun triggerEmergency() {

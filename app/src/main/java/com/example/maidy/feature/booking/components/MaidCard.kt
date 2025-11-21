@@ -16,11 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.maidy.feature.booking.BookingStatus
+import coil.compose.AsyncImage
+import com.example.maidy.core.model.BookingStatus
 import com.example.maidy.feature.booking.MaidInfo
 import com.example.maidy.ui.theme.*
 
@@ -48,9 +50,9 @@ fun MaidCard(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Profile Image Placeholder
+                // Profile Image
                 Box(
                     modifier = Modifier
                         .size(80.dp)
@@ -63,12 +65,21 @@ fun MaidCard(
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Maid Profile",
-                        tint = BookingStatusServiceLabel,
-                        modifier = Modifier.size(48.dp)
-                    )
+                    if (maidInfo.profileImageUrl.isNotBlank()) {
+                        AsyncImage(
+                            model = maidInfo.profileImageUrl,
+                            contentDescription = "Maid Profile",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Maid Profile",
+                            tint = BookingStatusServiceLabel,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
                 }
                 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -98,7 +109,7 @@ fun MaidCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = maidInfo.rating.toString(),
+                            text = String.format("%.1f", maidInfo.rating),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             color = BookingStatusMaidName
@@ -196,4 +207,3 @@ fun MaidCardPreview() {
         )
     }
 }
-
