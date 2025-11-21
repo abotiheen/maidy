@@ -90,6 +90,11 @@ sealed class Screen(
     data object Settings : Screen("settings", "Profile", showTopBar = false, showBottomBar = true)
     
     /**
+     * Edit Profile screen - edit user profile information
+     */
+    data object EditProfile : Screen("edit_profile", "Edit Profile")
+    
+    /**
      * Terms and Conditions screen - display app terms and conditions
      */
     data object TermsAndConditions : Screen("terms_and_conditions", "Terms and Conditions")
@@ -127,6 +132,7 @@ fun getScreenFromRoute(route: String?): Screen {
         route.startsWith("notifications") -> Screen.Notifications
         route.startsWith("rating") -> Screen.Rating
         route.startsWith("settings") -> Screen.Settings
+        route.startsWith("edit_profile") -> Screen.EditProfile
         route.startsWith("terms_and_conditions") -> Screen.TermsAndConditions
         route.startsWith("admin_add_maid") -> Screen.AdminAddMaid
         else -> Screen.Auth

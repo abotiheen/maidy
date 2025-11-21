@@ -61,7 +61,7 @@ fun AdjustRecurringTimeSelector(
             Icon(
                 painter = painterResource(R.drawable.time),
                 contentDescription = "Select time",
-                tint = AdjustRecurringTimeIcon,
+                tint = BookingDetailsDateIcon,
                 modifier = Modifier.size(24.dp)
             )
         }

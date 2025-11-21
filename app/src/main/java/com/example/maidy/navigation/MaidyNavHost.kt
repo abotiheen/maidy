@@ -24,6 +24,7 @@ import com.example.maidy.feature.adjust_recurring.AdjustRecurringScreen
 import com.example.maidy.feature.auth.AuthScreen
 import com.example.maidy.feature.booking.BookingStatusScreen
 import com.example.maidy.feature.booking_details.BookingDetailsScreen
+import com.example.maidy.feature.edit_profile.EditProfileScreen
 import com.example.maidy.feature.home.HomeScreen
 import com.example.maidy.feature.maid_details.MaidProfileScreen
 import com.example.maidy.feature.maidlist.MaidListScreen
@@ -286,6 +287,18 @@ fun MaidyNavHost(
                         // Single instance of auth screen
                         launchSingleTop = true
                     }
+                },
+                onNavigateToEditProfile = {
+                    navController.navigate(Screen.EditProfile.route)
+                }
+            )
+        }
+
+            // Edit Profile Screen - Edit User Profile
+            composable(route = Screen.EditProfile.route) {
+                EditProfileScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
                 }
             )
         }

@@ -34,39 +34,10 @@ import androidx.compose.ui.graphics.Color
 fun ProfileScreen(
     viewModel: ProfileViewModel = koinViewModel(),
     onNavigateToAuth: () -> Unit = {},
+    onNavigateToEditProfile: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
-    
-    // Image picker launcher
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            viewModel.onEvent(ProfileEvent.UpdateProfileImage(it.toString()))
-        }
-    }
-    
-    // Permission state for camera and storage
-    val permissionsState = rememberMultiplePermissionsState(
-        permissions = buildList {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                add(Manifest.permission.READ_MEDIA_IMAGES)
-            } else {
-                add(Manifest.permission.READ_EXTERNAL_STORAGE)
-            }
-        }
-    )
-    
-    // Handle profile image click
-    val onEditProfileImage = {
-        if (permissionsState.allPermissionsGranted) {
-            imagePickerLauncher.launch("image/*")
-        } else {
-            permissionsState.launchMultiplePermissionRequest()
-        }
-    }
     
     // Load user profile on first composition
     LaunchedEffect(Unit) {
@@ -83,7 +54,7 @@ fun ProfileScreen(
     
     ProfileScreenContent(
         uiState = uiState,
-        onEditProfileImageClick = onEditProfileImage,
+        onEditProfileImageClick = onNavigateToEditProfile,
         onEvent = viewModel::onEvent,
         modifier = modifier
     )

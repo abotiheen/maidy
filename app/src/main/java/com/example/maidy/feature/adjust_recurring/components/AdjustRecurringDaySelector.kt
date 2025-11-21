@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -87,8 +88,8 @@ private fun DayButton(
     Box(
         modifier = modifier
             .aspectRatio(1f)
-            .background(backgroundColor, RoundedCornerShape(12.dp))
-            .border(1.5.dp, borderColor, RoundedCornerShape(12.dp))
+            .background(backgroundColor, CircleShape)
+            .border(1.5.dp, borderColor, CircleShape)
             .clickable(
                 onClick = onClick,
                 indication = null,
