@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -17,9 +18,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.maidy.R
 import com.example.maidy.feature.admin.AdminAddMaidScreen
 import com.example.maidy.feature.auth.AuthScreen
 import com.example.maidy.feature.booking.BookingStatusScreen
+import com.example.maidy.feature.booking_details.BookingDetailsScreen
 import com.example.maidy.feature.home.HomeScreen
 import com.example.maidy.feature.maid_details.MaidProfileScreen
 import com.example.maidy.feature.maidlist.MaidListScreen
@@ -66,7 +69,7 @@ fun MaidyNavHost(
                         if (navController.previousBackStackEntry != null) {
                             IconButton(onClick = { navController.popBackStack() }) {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    painter = painterResource(R.drawable.arrow_back),
                                     contentDescription = "Back",
                                     tint = MaidyTextPrimary
                                 )
@@ -150,7 +153,41 @@ fun MaidyNavHost(
             )
         ) { backStackEntry ->
             val maidId = backStackEntry.arguments?.getString("maidId") ?: ""
-            MaidProfileScreen(maidId = maidId)
+            MaidProfileScreen(
+                maidId = maidId,
+                onBookNowClick = {
+                    navController.navigate(Screen.BookingDetails.createRoute(maidId))
+                }
+            )
+        }
+        
+        // Booking Details Screen - Book Service with a Maid
+        composable(
+            route = Screen.BookingDetails.route,
+            arguments = listOf(
+                navArgument("maidId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val maidId = backStackEntry.arguments?.getString("maidId") ?: ""
+            BookingDetailsScreen(
+                maidId = maidId,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onBookingConfirmed = {
+                    // Navigate to home after booking is confirmed, clearing the back stack
+                    navController.navigate(Screen.Home.route) {
+                        // Clear all back stack entries up to and including the booking details
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = false
+                        }
+                        // Avoid multiple copies of home in back stack
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
         
         // Booking Status Screen - Track Current Booking

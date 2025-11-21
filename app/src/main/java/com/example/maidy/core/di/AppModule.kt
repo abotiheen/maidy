@@ -1,12 +1,14 @@
 package com.example.maidy.core.di
 
 import com.example.maidy.core.data.AuthRepository
+import com.example.maidy.core.data.BookingRepository
 import com.example.maidy.core.data.MaidRepository
 import com.example.maidy.core.data.SessionManager
 import com.example.maidy.core.data.UserRepository
 import com.example.maidy.core.util.ImageCompressor
 import com.example.maidy.feature.admin.AdminAddMaidViewModel
 import com.example.maidy.feature.auth.AuthViewModel
+import com.example.maidy.feature.booking_details.BookingDetailsViewModel
 import com.example.maidy.feature.home.HomeViewModel
 import com.example.maidy.feature.maid_details.MaidProfileViewModel
 import com.example.maidy.feature.maidlist.MaidListViewModel
@@ -34,6 +36,7 @@ val appModule = module {
     single { AuthRepository(get()) }
     single { UserRepository(get(), get()) }
     single { MaidRepository(get(), get()) }
+    single { BookingRepository(get()) }
 
     // ViewModels
     viewModel { AuthViewModel(get(), get(), get()) }
@@ -42,4 +45,5 @@ val appModule = module {
     viewModel { AdminAddMaidViewModel(get(), get()) }
     viewModel { MaidListViewModel(get()) }
     viewModel { MaidProfileViewModel(get()) }
+    viewModel { (maidId: String) -> BookingDetailsViewModel(maidId, get(), get(), get(), get()) }
 }

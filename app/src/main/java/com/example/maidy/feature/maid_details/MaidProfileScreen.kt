@@ -29,6 +29,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun MaidProfileScreen(
     maidId: String,
+    onBookNowClick: () -> Unit = {},
     viewModel: MaidProfileViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -41,7 +42,7 @@ fun MaidProfileScreen(
     MaidProfileContent(
         uiState = uiState,
         onTabSelected = { tab -> viewModel.onEvent(MaidProfileUiEvent.OnTabSelected(tab)) },
-        onBookNowClick = { viewModel.onEvent(MaidProfileUiEvent.OnBookNowClick) },
+        onBookNowClick = onBookNowClick,
         modifier = modifier
     )
 }

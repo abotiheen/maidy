@@ -37,6 +37,16 @@ sealed class Screen(
     }
     
     /**
+     * Booking details screen - book a service with a specific maid
+     * Route includes maidId parameter: booking_details/{maidId}
+     */
+    data object BookingDetails : Screen("booking_details/{maidId}", "Book Service") {
+        fun createRoute(maidId: String): String {
+            return "booking_details/$maidId"
+        }
+    }
+    
+    /**
      * Booking status screen - track current booking status
      * Route includes bookingId parameter: booking_status/{bookingId}
      */
@@ -94,6 +104,7 @@ fun getScreenFromRoute(route: String?): Screen {
         route.startsWith("home") -> Screen.Home
         route.startsWith("maid_list") -> Screen.MaidList
         route.startsWith("maid_profile") -> Screen.MaidProfile
+        route.startsWith("booking_details") -> Screen.BookingDetails
         route.startsWith("booking_status") -> Screen.BookingStatus
         route.startsWith("emergency") -> Screen.Emergency
         route.startsWith("notifications") -> Screen.Notifications
