@@ -16,6 +16,7 @@ import com.example.maidy.feature.booking_details.BookingDetailsViewModel
 import com.example.maidy.feature.home.HomeViewModel
 import com.example.maidy.feature.maid_details.MaidProfileViewModel
 import com.example.maidy.feature.maidlist.MaidListViewModel
+import com.example.maidy.feature.search.SearchViewModel
 import com.example.maidy.feature.settings.ProfileViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -49,6 +50,7 @@ val appModule = module {
     viewModel { AdminAddMaidViewModel(get(), get()) }
     viewModel { MaidListViewModel(get()) }
     viewModel { MaidProfileViewModel(get()) }
+    viewModel { SearchViewModel(get()) }
     viewModel { (maidId: String) -> BookingDetailsViewModel(maidId, get(), get(), get(), get()) }
     viewModel { (bookingId: String) -> BookingStatusViewModel(bookingId, get(), get()) }
     viewModel { (bookingId: String) -> AdjustRecurringViewModel(bookingId, get(), get()) }

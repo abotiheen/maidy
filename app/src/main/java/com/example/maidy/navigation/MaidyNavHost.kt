@@ -136,6 +136,21 @@ fun MaidyNavHost(
                 },
                 onNavigateToBookingDetails = { bookingId ->
                     navController.navigate(Screen.BookingStatus.createRoute(bookingId))
+                },
+                onNavigateToSearch = {
+                    navController.navigate(Screen.Search.route)
+                }
+            )
+        }
+
+            // Search Screen - Search for Maids
+            composable(route = Screen.Search.route) {
+                com.example.maidy.feature.search.SearchScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onMaidClick = { maidId ->
+                        navController.navigate(Screen.MaidProfile.createRoute(maidId))
                 }
             )
         }

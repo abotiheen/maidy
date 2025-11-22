@@ -1,6 +1,7 @@
 package com.example.maidy.feature.home.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -25,16 +26,19 @@ import com.example.maidy.ui.theme.MaidyTheme
 fun HomeSearchBar(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp, vertical = 12.dp)
+            .height(TextFieldDefaults.MinHeight)
             .background(
                 color = HomeSearchBackground,
                 shape = RoundedCornerShape(12.dp)
             )
+            .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -46,28 +50,12 @@ fun HomeSearchBar(
         )
         
         Spacer(modifier = Modifier.width(12.dp))
-        
-        TextField(
-            value = searchQuery,
-            onValueChange = onSearchQueryChange,
-            placeholder = {
-                Text(
-                    text = "Search for maids, services...",
-                    fontSize = 16.sp,
-                    color = HomeSearchHint
-                )
-            },
-            readOnly = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-            ),
-            singleLine = true
+
+        Text(
+            text = "Search for maids, services...",
+            fontSize = 16.sp,
+            color = HomeSearchHint,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -78,7 +66,8 @@ fun HomeSearchBarPreview() {
     MaidyTheme {
         HomeSearchBar(
             searchQuery = "",
-            onSearchQueryChange = {}
+            onSearchQueryChange = {},
+            onClick = {}
         )
     }
 }
@@ -89,7 +78,8 @@ fun HomeSearchBarWithTextPreview() {
     MaidyTheme {
         HomeSearchBar(
             searchQuery = "Deep cleaning",
-            onSearchQueryChange = {}
+            onSearchQueryChange = {},
+            onClick = {}
         )
     }
 }

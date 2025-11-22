@@ -73,40 +73,48 @@ fun AdjustRecurringScreen(
                         showRateButton = uiState.hasCompletedBefore,
                         onRateClick = onNavigateToRating
                     )
+                    // Frequency Selector
+                    AdjustRecurringFrequencySelector(
+                        selectedType = uiState.recurringType,
+                        onTypeSelected = { type ->
+                            viewModel.onEvent(AdjustRecurringEvent.RecurringTypeSelected(type))
+                        }
+                    )
+
+                    // Day Selector
+                    AdjustRecurringDaySelector(
+                        selectedDay = uiState.selectedDay,
+                        onDaySelected = { day ->
+                            viewModel.onEvent(AdjustRecurringEvent.DaySelected(day))
+                        }
+                    )
+
+                    // Time Selector
+                    AdjustRecurringTimeSelector(
+                        selectedTime = uiState.selectedTime,
+                        onTimeClick = { showTimePicker = true }
+                    )
+
+                    // Service Selector
+                    AdjustRecurringServiceSelector(
+                        selectedService = uiState.selectedServiceType,
+                        onServiceSelected = { service ->
+                            viewModel.onEvent(AdjustRecurringEvent.ServiceTypeSelected(service))
+                        }
+                    )
+
+                    // Bottom spacing for button
+                    Spacer(modifier = Modifier.height(80.dp))
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = AdjustRecurringSaveButton)
+                    }
                 }
-
-                // Frequency Selector
-                AdjustRecurringFrequencySelector(
-                    selectedType = uiState.recurringType,
-                    onTypeSelected = { type ->
-                        viewModel.onEvent(AdjustRecurringEvent.RecurringTypeSelected(type))
-                    }
-                )
-
-                // Day Selector
-                AdjustRecurringDaySelector(
-                    selectedDay = uiState.selectedDay,
-                    onDaySelected = { day ->
-                        viewModel.onEvent(AdjustRecurringEvent.DaySelected(day))
-                    }
-                )
-
-                // Time Selector
-                AdjustRecurringTimeSelector(
-                    selectedTime = uiState.selectedTime,
-                    onTimeClick = { showTimePicker = true }
-                )
-
-                // Service Selector
-                AdjustRecurringServiceSelector(
-                    selectedService = uiState.selectedServiceType,
-                    onServiceSelected = { service ->
-                        viewModel.onEvent(AdjustRecurringEvent.ServiceTypeSelected(service))
-                    }
-                )
-
-                // Bottom spacing for button
-                Spacer(modifier = Modifier.height(80.dp))
             }
         }
 

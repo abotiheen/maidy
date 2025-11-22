@@ -119,6 +119,43 @@ class MaidRepository(
     }
     
     /**
+     * Search maids by name (server-side with client-side case-insensitive filtering)
+     *
+     * Since Firestore queries are case-sensitive and we don't have a lowercase field,
+     * we fetch all maids and filter client-side for case-insensitive matching.
+     * This is a temporary solution until we add a searchable lowercase field.
+     */
+    suspend fun searchMaidsByName(query: String): Result<List<Maid>> {
+        return try {
+            if (query.isBlank()) {
+                return Result.success(emptyList())
+            }
+
+            println("🔍 MaidRepository: Searching for maids with query: $query")
+
+            // Fetch all maids (cached by Firestore for performance)
+            val snapshot = firestore.collection("maids")
+                .get()
+                .await()
+
+            val allMaids = snapshot.documents.mapNotNull { it.toObject(Maid::class.java) }
+
+            // Filter client-side for case-insensitive matching
+            val filteredMaids = allMaids.filter { maid ->
+                maid.fullName.contains(query, ignoreCase = true)
+            }
+
+            println("✅ MaidRepository: Found ${filteredMaids.size} maids matching '$query'")
+
+            Result.success(filteredMaids)
+        } catch (e: Exception) {
+            println("❌ MaidRepository: Search failed - ${e.message}")
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+    
+    /**
      * Get a specific maid by ID
      */
     suspend fun getMaidById(maidId: String): Result<Maid> {

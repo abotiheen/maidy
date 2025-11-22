@@ -22,6 +22,11 @@ sealed class Screen(
     data object Home : Screen("home", "Home", showTopBar = false, showBottomBar = true)
     
     /**
+     * Search screen - search for maids
+     */
+    data object Search : Screen("search", "Search", showTopBar = false)
+    
+    /**
      * Maid list screen - browse available maids
      */
     data object MaidList : Screen("maid_list", "Available Maids")
@@ -123,6 +128,7 @@ fun getScreenFromRoute(route: String?): Screen {
         route == null -> Screen.Auth
         route.startsWith("auth") -> Screen.Auth
         route.startsWith("home") -> Screen.Home
+        route.startsWith("search") -> Screen.Search
         route.startsWith("maid_list") -> Screen.MaidList
         route.startsWith("maid_profile") -> Screen.MaidProfile
         route.startsWith("booking_details") -> Screen.BookingDetails
