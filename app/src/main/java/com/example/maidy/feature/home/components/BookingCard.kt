@@ -190,8 +190,8 @@ private fun BookingStatusBadge(
 
         BookingStatus.CANCELLED -> Triple(
             "Cancelled",
-            BookingStatusInactiveIcon,
-            BookingStatusInactiveIcon.copy(alpha = 0.3f)
+            EmergencyIconBackground,
+            BookingStatusCancelButton
         )
     }
 
@@ -259,7 +259,7 @@ fun BookingCardOnTheWayPreview() {
                 serviceName = "Move-out Clean",
                 maidName = "Ana P.",
                 dateTime = "Nov 21, 2024 at 9:00 AM",
-                status = BookingStatus.ON_THE_WAY,
+                status = BookingStatus.CANCELLED,
                 profileImageUrl = ""
             ),
             onClick = {}

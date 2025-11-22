@@ -129,8 +129,20 @@ class ProfileViewModel(
     }
     
     private fun toggleDarkMode(enabled: Boolean) {
-        _uiState.update { it.copy(isDarkModeEnabled = enabled) }
-        // TODO: Persist preference and apply theme
+        // Revert the toggle back to false and show "Coming Soon" message
+        _uiState.update {
+            it.copy(
+                isDarkModeEnabled = false,
+                toastMessage = "🌙 Dark Mode coming soon!"
+            )
+        }
+    }
+
+    /**
+     * Clear toast message after it's been shown
+     */
+    fun onToastShown() {
+        _uiState.update { it.copy(toastMessage = null) }
     }
     
     private fun toggleNotifications(enabled: Boolean) {

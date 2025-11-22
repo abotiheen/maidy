@@ -24,6 +24,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.ui.graphics.Color
+import android.widget.Toast
 
 /**
  * Profile/Settings Screen
@@ -38,7 +39,8 @@ fun ProfileScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    
+    val context = LocalContext.current
+
     // Load user profile on first composition
     LaunchedEffect(Unit) {
         viewModel.loadUserProfile()
@@ -49,6 +51,14 @@ fun ProfileScreen(
         if (uiState.shouldNavigateToAuth) {
             onNavigateToAuth()
             viewModel.onLogoutNavigationHandled()
+        }
+    }
+
+    // Show toast messages
+    LaunchedEffect(uiState.toastMessage) {
+        uiState.toastMessage?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            viewModel.onToastShown()
         }
     }
     

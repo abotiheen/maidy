@@ -26,7 +26,7 @@ import com.example.maidy.ui.theme.MaidyTheme
 @Composable
 fun ActionButtons(
     onBookNowClick: () -> Unit,
-    onScheduleClick: () -> Unit,
+    onMyBookingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -40,18 +40,18 @@ fun ActionButtons(
             text = "Book Now",
             backgroundColor = HomeBookNowButton,
             textColor = Color.White,
-            iconRes = R.drawable.book_maid, // TODO: Replace with lightning/bolt icon
+            iconRes = R.drawable.book_maid,
             onClick = onBookNowClick,
             modifier = Modifier.weight(1f)
         )
 
-        // Schedule Button
+        // My Bookings Button
         ActionButton(
-            text = "Schedule",
+            text = "My Bookings",
             backgroundColor = HomeScheduleButton,
             textColor = HomeScheduleButtonText,
-            iconRes = R.drawable.calendar, // TODO: Replace with calendar icon
-            onClick = onScheduleClick,
+            iconRes = R.drawable.calendar,
+            onClick = onMyBookingsClick,
             modifier = Modifier.weight(1f)
         )
     }
@@ -110,7 +110,7 @@ fun ActionButtonsPreview() {
     MaidyTheme {
         ActionButtons(
             onBookNowClick = {},
-            onScheduleClick = {}
+            onMyBookingsClick = {}
         )
     }
 }

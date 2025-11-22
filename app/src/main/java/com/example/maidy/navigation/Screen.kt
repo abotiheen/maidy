@@ -27,6 +27,11 @@ sealed class Screen(
     data object Search : Screen("search", "Search", showTopBar = false)
     
     /**
+     * All Bookings screen - view all user bookings with filters
+     */
+    data object AllBookings : Screen("all_bookings", "My Bookings")
+    
+    /**
      * Maid list screen - browse available maids
      */
     data object MaidList : Screen("maid_list", "Available Maids")
@@ -129,6 +134,7 @@ fun getScreenFromRoute(route: String?): Screen {
         route.startsWith("auth") -> Screen.Auth
         route.startsWith("home") -> Screen.Home
         route.startsWith("search") -> Screen.Search
+        route.startsWith("all_bookings") -> Screen.AllBookings
         route.startsWith("maid_list") -> Screen.MaidList
         route.startsWith("maid_profile") -> Screen.MaidProfile
         route.startsWith("booking_details") -> Screen.BookingDetails

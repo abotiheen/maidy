@@ -18,6 +18,7 @@ data class BookingItem(
     val serviceName: String,
     val maidName: String,
     val dateTime: String,  // Formatted as "Nov 21, 2024 at 10:00 AM"
+    val timestamp: Long = 0L,  // Timestamp for filtering/sorting
     val status: BookingStatus,
     val profileImageUrl: String = "",
     val isRecurring: Boolean = false
@@ -205,12 +206,18 @@ class HomeViewModel(
             date = booking.nextScheduledDate,
             time = time
         )
-        
+
+        // Get timestamp for filtering - use nextScheduledDate or bookingDate
+        val timestamp = booking.nextScheduledDate?.toDate()?.time
+            ?: booking.bookingDate?.toDate()?.time
+            ?: 0L
+
         return BookingItem(
             id = booking.id,
             serviceName = booking.bookingType.displayName(),
             maidName = booking.maidFullName,
             dateTime = formattedDateTime,
+            timestamp = timestamp,
             status = mapFirebaseStatusToUiStatus(booking.status),
             profileImageUrl = booking.maidProfileImageUrl,
             isRecurring = booking.isRecurring

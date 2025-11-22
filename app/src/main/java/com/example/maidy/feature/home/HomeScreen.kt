@@ -19,7 +19,7 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
     onNavigateToBooking: () -> Unit = {},
-    onNavigateToSchedule: () -> Unit = {},
+    onNavigateToMyBookings: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToBookingDetails: (String) -> Unit = {},
     onNavigateToAdmin: () -> Unit = {},
@@ -31,7 +31,7 @@ fun HomeScreen(
         uiState = uiState,
         onEvent = viewModel::onEvent,
         onNavigateToBooking = onNavigateToBooking,
-        onNavigateToSchedule = onNavigateToSchedule,
+        onNavigateToMyBookings = onNavigateToMyBookings,
         onNavigateToNotifications = onNavigateToNotifications,
         onNavigateToBookingDetails = onNavigateToBookingDetails,
         onNavigateToAdmin = onNavigateToAdmin,
@@ -44,7 +44,7 @@ private fun HomeScreenContent(
     uiState: HomeUiState,
     onEvent: (HomeUiEvent) -> Unit,
     onNavigateToBooking: () -> Unit,
-    onNavigateToSchedule: () -> Unit,
+    onNavigateToMyBookings: () -> Unit,
     onNavigateToNotifications: () -> Unit,
     onNavigateToBookingDetails: (String) -> Unit,
     onNavigateToAdmin: () -> Unit,
@@ -92,9 +92,8 @@ private fun HomeScreenContent(
                     onEvent(HomeUiEvent.OnBookNowClick)
                     onNavigateToBooking()
                 },
-                onScheduleClick = {
-                    onEvent(HomeUiEvent.OnScheduleClick)
-                    onNavigateToSchedule()
+                onMyBookingsClick = {
+                    onNavigateToMyBookings()
                 }
             )
         }
@@ -165,7 +164,7 @@ fun HomeScreenPreview() {
             ),
             onEvent = {},
             onNavigateToBooking = {},
-            onNavigateToSchedule = {},
+            onNavigateToMyBookings = {},
             onNavigateToNotifications = {},
             onNavigateToBookingDetails = {},
             onNavigateToAdmin = {},
@@ -187,7 +186,7 @@ fun HomeScreenEmptyPreview() {
             ),
             onEvent = {},
             onNavigateToBooking = {},
-            onNavigateToSchedule = {},
+            onNavigateToMyBookings = {},
             onNavigateToNotifications = {},
             onNavigateToBookingDetails = {},
             onNavigateToAdmin = {},

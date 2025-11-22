@@ -14,7 +14,8 @@ data class ProfileUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val shouldNavigateToAuth: Boolean = false,
-    val showLogoutDialog: Boolean = false
+    val showLogoutDialog: Boolean = false,
+    val toastMessage: String? = null
 )
 
 /**

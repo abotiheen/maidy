@@ -131,6 +131,9 @@ fun MaidyNavHost(
                 onNavigateToBooking = {
                     navController.navigate(Screen.MaidList.route)
                 },
+                onNavigateToMyBookings = {
+                    navController.navigate(Screen.AllBookings.route)
+                },
                 onNavigateToAdmin = {
                     navController.navigate(Screen.AdminAddMaid.route)
                 },
@@ -151,6 +154,15 @@ fun MaidyNavHost(
                     },
                     onMaidClick = { maidId ->
                         navController.navigate(Screen.MaidProfile.createRoute(maidId))
+                    }
+                )
+            }
+
+            // All Bookings Screen - View All User Bookings
+            composable(route = Screen.AllBookings.route) {
+                com.example.maidy.feature.all_bookings.AllBookingsScreen(
+                    onNavigateToBookingDetails = { bookingId ->
+                        navController.navigate(Screen.BookingStatus.createRoute(bookingId))
                 }
             )
         }
