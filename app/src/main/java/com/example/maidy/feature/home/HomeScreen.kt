@@ -4,6 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,20 +29,41 @@ fun HomeScreen(
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToBookingDetails: (String) -> Unit = {},
     onNavigateToAdmin: () -> Unit = {},
-    onNavigateToSearch: () -> Unit = {}
+    onNavigateToSearch: () -> Unit = {},
+    onNavigateToChat: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    HomeScreenContent(
-        uiState = uiState,
-        onEvent = viewModel::onEvent,
-        onNavigateToBooking = onNavigateToBooking,
-        onNavigateToMyBookings = onNavigateToMyBookings,
-        onNavigateToNotifications = onNavigateToNotifications,
-        onNavigateToBookingDetails = onNavigateToBookingDetails,
-        onNavigateToAdmin = onNavigateToAdmin,
-        onNavigateToSearch = onNavigateToSearch
-    )
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onNavigateToChat
+            ) {
+                Column(
+                    horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Text(
+                        "🤖",
+                        style = androidx.compose.material3.MaterialTheme.typography.titleLarge
+                    )
+                }
+            }
+        },
+        containerColor = MaidyBackgroundWhite
+    ) { paddingValues ->
+        HomeScreenContent(
+            uiState = uiState,
+            onEvent = viewModel::onEvent,
+            onNavigateToBooking = onNavigateToBooking,
+            onNavigateToMyBookings = onNavigateToMyBookings,
+            onNavigateToNotifications = onNavigateToNotifications,
+            onNavigateToBookingDetails = onNavigateToBookingDetails,
+            onNavigateToAdmin = onNavigateToAdmin,
+            onNavigateToSearch = onNavigateToSearch,
+            modifier = Modifier.padding(paddingValues)
+        )
+    }
 }
 
 @Composable

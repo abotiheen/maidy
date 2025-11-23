@@ -100,6 +100,11 @@ sealed class Screen(
     data object Settings : Screen("settings", "Profile", showTopBar = false, showBottomBar = true)
     
     /**
+     * Chat screen - AI assistant powered by Gemini
+     */
+    data object Chat : Screen("chat", "AI Assistant")
+    
+    /**
      * Edit Profile screen - edit user profile information
      */
     data object EditProfile : Screen("edit_profile", "Edit Profile")
@@ -147,6 +152,7 @@ fun getScreenFromRoute(route: String?): Screen {
         route.startsWith("edit_profile") -> Screen.EditProfile
         route.startsWith("terms_and_conditions") -> Screen.TermsAndConditions
         route.startsWith("admin_add_maid") -> Screen.AdminAddMaid
+        route.startsWith("chat") -> Screen.Chat
         else -> Screen.Auth
     }
 }

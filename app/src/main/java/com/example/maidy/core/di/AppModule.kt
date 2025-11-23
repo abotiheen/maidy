@@ -2,17 +2,20 @@ package com.example.maidy.core.di
 
 import com.example.maidy.core.data.AuthRepository
 import com.example.maidy.core.data.BookingRepository
+import com.example.maidy.core.data.ChatRepository
 import com.example.maidy.core.data.MaidRepository
 import com.example.maidy.core.data.NotificationPreferencesManager
 import com.example.maidy.core.data.SessionManager
 import com.example.maidy.core.data.UserRepository
 import com.example.maidy.core.service.FcmTokenManager
+import com.example.maidy.core.service.GeminiChatService
 import com.example.maidy.core.service.NotificationService
 import com.example.maidy.core.util.ImageCompressor
 import com.example.maidy.feature.admin.AdminAddMaidViewModel
 import com.example.maidy.feature.adjust_recurring.AdjustRecurringViewModel
 import com.example.maidy.feature.all_bookings.AllBookingsViewModel
 import com.example.maidy.feature.auth.AuthViewModel
+import com.example.maidy.feature.chat.ChatViewModel
 import com.example.maidy.feature.edit_profile.EditProfileViewModel
 import com.example.maidy.feature.rating.RatingViewModel
 import com.example.maidy.feature.booking.BookingStatusViewModel
@@ -47,12 +50,14 @@ val appModule = module {
     // Services
     single { FcmTokenManager(get()) }
     single { NotificationService(get(), get()) }
+    single { GeminiChatService(get(), get(), get()) }
 
     // Repositories
     single { AuthRepository(get()) }
     single { UserRepository(get(), get()) }
     single { MaidRepository(get(), get()) }
     single { BookingRepository(get(), get()) }
+    single { ChatRepository(get()) }
 
     // ViewModels
     viewModel { AuthViewModel(get(), get(), get(), get()) }
@@ -68,4 +73,5 @@ val appModule = module {
     viewModel { (bookingId: String) -> AdjustRecurringViewModel(bookingId, get(), get()) }
     viewModel { (bookingId: String) -> RatingViewModel(bookingId, get(), get(), get(), get()) }
     viewModel { EditProfileViewModel(get(), get(), get()) }
+    viewModel { ChatViewModel(get()) }
 }

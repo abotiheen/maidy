@@ -24,6 +24,7 @@ import com.example.maidy.feature.adjust_recurring.AdjustRecurringScreen
 import com.example.maidy.feature.auth.AuthScreen
 import com.example.maidy.feature.booking.BookingStatusScreen
 import com.example.maidy.feature.booking_details.BookingDetailsScreen
+import com.example.maidy.feature.chat.ChatScreen
 import com.example.maidy.feature.edit_profile.EditProfileScreen
 import com.example.maidy.feature.home.HomeScreen
 import com.example.maidy.feature.maid_details.MaidProfileScreen
@@ -142,6 +143,9 @@ fun MaidyNavHost(
                 },
                 onNavigateToSearch = {
                     navController.navigate(Screen.Search.route)
+                },
+                onNavigateToChat = {
+                    navController.navigate(Screen.Chat.route)
                 }
             )
         }
@@ -338,6 +342,15 @@ fun MaidyNavHost(
         // Admin Add Maid Screen - For populating Firebase
         composable(route = Screen.AdminAddMaid.route) {
             AdminAddMaidScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+            // Chat Screen - AI Assistant
+            composable(route = Screen.Chat.route) {
+                ChatScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
