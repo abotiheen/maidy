@@ -18,6 +18,8 @@ googleServices = "4.4.2"
 coil = "2.6.0"
 accompanist = "0.34.0"
 gemini = "0.9.0"
+# ADD THIS LINE
+kotlinxSerialization = "1.6.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -52,6 +54,10 @@ koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compos
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
 generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "gemini" }
+firebase-vertexai = { group = "com.google.firebase", name = "firebase-vertexai" }
+
+# ADD THIS LINE
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

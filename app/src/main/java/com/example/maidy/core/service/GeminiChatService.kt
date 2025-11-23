@@ -1,20 +1,32 @@
 package com.example.maidy.core.service
 
-import com.example.maidy.BuildConfig
 import com.example.maidy.core.data.BookingRepository
 import com.example.maidy.core.data.MaidRepository
 import com.example.maidy.core.data.SessionManager
 import com.example.maidy.core.model.Booking
 import com.example.maidy.core.model.Maid
-import com.google.ai.client.generativeai.GenerativeModel
+import com.google.firebase.Firebase
+import com.google.firebase.vertexai.Chat
+import com.google.firebase.vertexai.type.FunctionDeclaration
+import com.google.firebase.vertexai.type.Schema
+import com.google.firebase.vertexai.type.Tool
+import com.google.firebase.vertexai.type.content
+import com.google.firebase.vertexai.vertexAI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+// Import kotlinx serialization types
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonObject as KJsonObject
+
 /**
- * Service for handling Gemini AI chat interactions
- * Provides intelligent responses to user queries about bookings and maids
+ * Service for handling Gemini AI chat interactions using Firebase Vertex AI
+ * Provides intelligent responses to user queries about bookings and maids using Function Calling
  */
 class GeminiChatService(
     private val bookingRepository: BookingRepository,
@@ -22,10 +34,54 @@ class GeminiChatService(
     private val sessionManager: SessionManager
 ) {
 
-    private val generativeModel = GenerativeModel(
-        modelName = "gemini-1.5-flash",
-        apiKey = BuildConfig.GEMINI_API_KEY
+    // 1. Define Tools (Function Declarations)
+    // Using emptyMap<String, Schema>() is acceptable for this SDK version
+    private val getUserBookingsTool = FunctionDeclaration(
+        name = "getUserBookings",
+        description = "Get the current user's bookings/appointments history and upcoming schedule. Returns a JSON list of bookings.",
+        parameters = emptyMap<String, Schema>()
     )
+
+    private val getAvailableMaidsTool = FunctionDeclaration(
+        name = "getAvailableMaids",
+        description = "Get a list of available professional maids with their ratings, rates, and details. Returns a JSON list of maids.",
+        parameters = emptyMap<String, Schema>()
+    )
+
+    // 2. Initialize Model with Tools
+    private val generativeModel = Firebase.vertexAI.generativeModel(
+        modelName = "gemini-2.5-flash",
+        tools = listOf(
+            Tool.functionDeclarations(
+                listOf(
+                    getUserBookingsTool,
+                    getAvailableMaidsTool
+                )
+            )
+        ),
+        systemInstruction = content {
+            text(
+                """
+                You are a friendly and helpful assistant for the Maidy app (a maid booking service).
+                Your goal is to help users manage their bookings and find the best maids.
+                
+                Services offered:
+                - Deep Cleaning
+                - Standard Cleaning
+                - Move-out Clean
+                
+                Always use the provided tools to fetch real data when the user asks about bookings or maids.
+                If the user is not logged in (getUserBookings returns error), kindly ask them to log in.
+                
+                Keep your responses concise, warm, and helpful. 
+                Do not make up booking IDs or maid names. Only use what the tools return.
+            """.trimIndent()
+            )
+        }
+    )
+
+    // 3. Persist Chat State
+    private var chatSession: Chat? = null
 
     /**
      * Process user message and generate AI response
@@ -34,267 +90,156 @@ class GeminiChatService(
         try {
             println("🤖 GeminiChatService: Processing message: $userMessage")
 
-            // Classify user intent
-            val intent = classifyIntent(userMessage)
-            println("🤖 Intent detected: $intent")
+            // Initialize chat if null
+            if (chatSession == null) {
+                chatSession = generativeModel.startChat()
+            }
+            val chat = chatSession!!
 
-            // Get context-aware response based on intent
-            val response = when (intent) {
-                "QUERY_BOOKINGS" -> handleBookingsQuery(userMessage)
-                "SEARCH_MAIDS" -> handleMaidsSearch(userMessage)
-                else -> handleGeneralQuery(userMessage)
+            var response = chat.sendMessage(userMessage)
+
+            // Handle function calls loop
+            var turnCount = 0
+            while (response.functionCalls.isNotEmpty() && turnCount < 5) {
+                val functionCall = response.functionCalls.first()
+                val functionName = functionCall.name
+                println("🤖 Executing tool: $functionName")
+
+                val functionResult = when (functionName) {
+                    "getUserBookings" -> executeGetUserBookings()
+                    "getAvailableMaids" -> executeGetAvailableMaids()
+                    else -> JSONObject().put("error", "Unknown function")
+                }
+
+                // Send the result back to the model.
+                // We must convert org.json.JSONObject to kotlinx.serialization.json.JsonObject
+                response = chat.sendMessage(
+                    content {
+                        part(
+                            com.google.firebase.vertexai.type.FunctionResponsePart(
+                                functionName,
+                                jsonToKotlinxJsonObject(functionResult)
+                            )
+                        )
+                    }
+                )
+                turnCount++
             }
 
-            println("✅ GeminiChatService: Response generated")
-            Result.success(response)
+            println("✅ GeminiChatService: Response generated: ${response.text}")
+            Result.success(response.text ?: "I'm sorry, I couldn't generate a text response, but I processed your request.")
         } catch (e: Exception) {
             println("❌ GeminiChatService: Error - ${e.message}")
             e.printStackTrace()
+            // Reset chat on fatal error to clear bad state
+            chatSession = null
             Result.failure(e)
         }
     }
 
     /**
-     * Classify user intent using simple keyword matching
+     * Clears the current chat history. Call this when user logs out or clicks "New Chat".
      */
-    private fun classifyIntent(message: String): String {
-        val lowerMessage = message.lowercase()
-
-        return when {
-            lowerMessage.contains("booking") ||
-                    lowerMessage.contains("appointment") ||
-                    lowerMessage.contains("schedule") ||
-                    lowerMessage.contains("upcoming") ||
-                    lowerMessage.contains("my bookings") ||
-                    lowerMessage.contains("status") -> "QUERY_BOOKINGS"
-
-            lowerMessage.contains("maid") ||
-                    lowerMessage.contains("best") ||
-                    lowerMessage.contains("top rated") ||
-                    lowerMessage.contains("highest rated") ||
-                    lowerMessage.contains("available") ||
-                    lowerMessage.contains("find") ||
-                    lowerMessage.contains("search") ||
-                    lowerMessage.contains("recommend") -> "SEARCH_MAIDS"
-
-            else -> "GENERAL"
-        }
+    fun clearHistory() {
+        chatSession = null
     }
 
+    // --- Tool Implementations ---
+
+    private suspend fun executeGetUserBookings(): JSONObject {
+        val userId = sessionManager.getCurrentUserId()
+        if (userId == null) {
+            return JSONObject().put("error", "User not logged in. Please ask user to log in.")
+        }
+
+        val result = bookingRepository.getUserBookings(userId)
+        val bookings = result.getOrNull() ?: emptyList()
+
+        if (bookings.isEmpty()) {
+            return JSONObject().put("message", "No bookings found.")
+        }
+
+        return formatBookingsToJson(bookings)
+    }
+
+    private suspend fun executeGetAvailableMaids(): JSONObject {
+        val result = maidRepository.getAllMaids()
+        val maids = result.getOrNull() ?: emptyList()
+        val availableMaids = maids.filter { it.available }
+
+        if (availableMaids.isEmpty()) {
+            return JSONObject().put("message", "No maids currently available.")
+        }
+
+        return formatMaidsToJson(availableMaids)
+    }
+
+    // --- Formatting Helpers ---
+
     /**
-     * Handle queries about user's bookings
+     * Converts an org.json.JSONObject to a kotlinx.serialization.json.JsonObject
+     * This is required because Firebase Vertex AI uses Kotlinx Serialization.
      */
-    private suspend fun handleBookingsQuery(message: String): String {
-        val userId =
-            sessionManager.getCurrentUserId() ?: return "Please log in to view your bookings."
+    private fun jsonToKotlinxJsonObject(json: JSONObject): KJsonObject {
+        val map = mutableMapOf<String, JsonElement>()
+        val keys = json.keys()
+        while (keys.hasNext()) {
+            val key = keys.next()
+            val value = json.get(key)
 
-        val bookingsResult = bookingRepository.getUserBookings(userId)
-
-        return if (bookingsResult.isSuccess) {
-            val bookings = bookingsResult.getOrNull() ?: emptyList()
-
-            if (bookings.isEmpty()) {
-                "You don't have any bookings yet. Would you like to browse available maids and create a booking?"
-            } else {
-                generateBookingsSummary(bookings, message)
+            // We convert values to JsonPrimitive (Strings/Numbers) or String representation of complex objects
+            // This avoids deep recursion complexity for now, as the model can parse JSON strings inside values easily.
+            map[key] = when (value) {
+                is String -> JsonPrimitive(value)
+                is Number -> JsonPrimitive(value)
+                is Boolean -> JsonPrimitive(value)
+                // For nested Arrays/Objects, passing them as stringified JSON is safer and cleaner for the model to read
+                is JSONObject -> JsonPrimitive(value.toString())
+                is JSONArray -> JsonPrimitive(value.toString())
+                else -> JsonPrimitive(value.toString())
             }
-        } else {
-            "I'm having trouble accessing your bookings right now. Please try again later."
         }
+        return KJsonObject(map)
     }
 
-    /**
-     * Generate AI summary of user's bookings
-     */
-    private suspend fun generateBookingsSummary(
-        bookings: List<Booking>,
-        userQuery: String
-    ): String {
-        val dateFormat = SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a", Locale.getDefault())
+    private fun formatBookingsToJson(bookings: List<Booking>): JSONObject {
+        val jsonArray = JSONArray()
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
-        val bookingsInfo = bookings.take(10).joinToString("\n") { booking ->
+        bookings.take(15).forEach { booking ->
             val dateStr = booking.nextScheduledDate?.toDate()?.let { date ->
                 dateFormat.format(date)
             } ?: "Not scheduled"
-            """
-            - ${booking.bookingType.displayName()} with ${booking.maidFullName}
-              Status: ${booking.status.name}
-              ${if (booking.isRecurring) "Recurring: ${booking.recurringType?.name}" else "One-time booking"}
-              Next scheduled: $dateStr
-            """.trimIndent()
-        }
 
-        val prompt = """
-            You are a helpful assistant for the Maidy app (a maid booking service).
-            
-            User question: "$userQuery"
-            
-            User's bookings:
-            $bookingsInfo
-            
-            Total bookings: ${bookings.size}
-            
-            Provide a friendly, concise response about their bookings. If they have upcoming bookings, 
-            mention the next one with details. If asking about a specific booking or status, focus on that.
-            Be conversational and helpful. Keep response under 150 words.
-        """.trimIndent()
-
-        return try {
-            val response = generativeModel.generateContent(prompt)
-            response.text ?: "You have ${bookings.size} booking(s) in total."
-        } catch (e: Exception) {
-            println("❌ Error generating bookings summary: ${e.message}")
-            val upcomingBookings = bookings.filter {
-                it.status.name != "COMPLETED" && it.status.name != "CANCELLED"
+            val json = JSONObject().apply {
+                put("type", booking.bookingType.displayName())
+                put("maid", booking.maidFullName)
+                put("status", booking.status.name)
+                put("isRecurring", booking.isRecurring)
+                put("scheduled", dateStr)
+                put("bookingId", booking.id)
             }
-            if (upcomingBookings.isNotEmpty()) {
-                val next = upcomingBookings.first()
-                val dateStr = next.nextScheduledDate?.toDate()?.let { date ->
-                    dateFormat.format(date)
-                } ?: "an unscheduled date"
-                """
-                You have ${bookings.size} booking(s) total.
-                
-                Your next booking:
-                • ${next.bookingType.displayName()} with ${next.maidFullName}
-                • Status: ${next.status.name}
-                • Scheduled: $dateStr
-                """.trimIndent()
-            } else {
-                "You have ${bookings.size} booking(s), but no upcoming appointments scheduled."
-            }
+            jsonArray.put(json)
         }
+        return JSONObject().apply { put("bookings", jsonArray) }
     }
 
-    /**
-     * Handle maid search queries
-     */
-    private suspend fun handleMaidsSearch(message: String): String {
-        val maidsResult = maidRepository.getAllMaids()
+    private fun formatMaidsToJson(maids: List<Maid>): JSONObject {
+        val jsonArray = JSONArray()
 
-        return if (maidsResult.isSuccess) {
-            val maids = maidsResult.getOrNull() ?: emptyList()
-
-            if (maids.isEmpty()) {
-                "I couldn't find any maids available at the moment. Please check back later!"
-            } else {
-                generateMaidsSummary(maids, message)
+        // Sort by rating and take top 10 to manage token usage
+        maids.sortedByDescending { it.averageRating }.take(10).forEach { maid ->
+            val json = JSONObject().apply {
+                put("name", maid.fullName)
+                put("rating", maid.averageRating)
+                put("reviews", maid.reviewCount)
+                put("hourlyRate", maid.hourlyRate)
+                put("specialty", maid.specialtyTag)
+                put("services", JSONArray(maid.services))
+                put("maidId", maid.id)
             }
-        } else {
-            "I'm having trouble searching for maids right now. Please try again later."
+            jsonArray.put(json)
         }
-    }
-
-    /**
-     * Generate AI summary of available maids
-     */
-    private suspend fun generateMaidsSummary(maids: List<Maid>, userQuery: String): String {
-        // Filter available maids and sort by rating
-        val availableMaids = maids.filter { it.available }
-            .sortedByDescending { it.averageRating }
-            .take(5)
-
-        val maidsInfo = availableMaids.joinToString("\n") { maid ->
-            """
-            - ${maid.fullName}
-              Rating: ${maid.averageRating}/5.0 (${maid.reviewCount} reviews)
-              Hourly Rate: $${maid.hourlyRate}/hour
-              ${if (maid.specialtyTag.isNotEmpty()) "Specialty: ${maid.specialtyTag}" else ""}
-              ${
-                if (maid.services.isNotEmpty()) "Services: ${
-                    maid.services.take(3).joinToString(", ")
-                }" else ""
-            }
-            """.trimIndent()
-        }
-
-        val prompt = """
-            You are a helpful assistant for the Maidy app (a maid booking service).
-            
-            User question: "$userQuery"
-            
-            Top available maids (sorted by rating):
-            $maidsInfo
-            
-            Total available maids: ${availableMaids.size}
-            
-            Provide a friendly response recommending maids based on their query.
-            Focus on the highest-rated maids, their specialties, and rates. 
-            Be enthusiastic and helpful. Keep response under 150 words.
-        """.trimIndent()
-
-        return try {
-            val response = generativeModel.generateContent(prompt)
-            response.text
-                ?: "We have ${availableMaids.size} maids available. Check the Maids tab to see their profiles!"
-        } catch (e: Exception) {
-            println("❌ Error generating maids summary: ${e.message}")
-            if (availableMaids.isNotEmpty()) {
-                val topMaid = availableMaids.first()
-                """
-                We have ${availableMaids.size} maids available!
-                
-                🌟 Top rated: ${topMaid.fullName}
-                • Rating: ${topMaid.averageRating}/5.0 (${topMaid.reviewCount} reviews)
-                • Rate: $${topMaid.hourlyRate}/hour
-                ${if (topMaid.specialtyTag.isNotEmpty()) "• Specialty: ${topMaid.specialtyTag}" else ""}
-                
-                Check the Maids tab to see all available maids and book your service!
-                """.trimIndent()
-            } else {
-                "We have several maids available. Check the Maids tab to browse their profiles and ratings!"
-            }
-        }
-    }
-
-    /**
-     * Handle general/unknown queries
-     */
-    private suspend fun handleGeneralQuery(message: String): String {
-        val prompt = """
-            You are a helpful assistant for the Maidy app (a maid booking service).
-            
-            User message: "$message"
-            
-            Context: Maidy is an app where users can:
-            - Find and book professional maids
-            - Schedule one-time or recurring cleaning services
-            - View maid profiles, ratings, and reviews
-            - Track their bookings and service history
-            
-            Services offered:
-            - Deep Cleaning
-            - Standard Cleaning
-            - Move-out Clean
-            
-            If the user is asking about:
-            - Bookings/appointments → Tell them they can ask "Show me my bookings" or "What's my booking status?"
-            - Finding maids → Tell them they can ask "Show me the best maids" or "Who are the top rated maids?"
-            - Services → Explain the three service types
-            
-            Provide a helpful, conversational response. Keep under 100 words.
-        """.trimIndent()
-
-        return try {
-            val response = generativeModel.generateContent(prompt)
-            response.text
-                ?: "I'm here to help with your Maidy bookings and finding the perfect maid. What can I assist you with?"
-        } catch (e: Exception) {
-            println("❌ Error generating general response: ${e.message}")
-            """
-            I'm your Maidy assistant! I can help you with:
-            
-            📅 Ask about your bookings and appointments
-            🌟 Find the best and highest-rated maids
-            🧹 Learn about our cleaning services
-            
-            Try asking:
-            • "Show me my bookings"
-            • "Who are the best maids?"
-            • "What services do you offer?"
-            
-            What would you like to know?
-            """.trimIndent()
-        }
+        return JSONObject().apply { put("maids", jsonArray) }
     }
 }

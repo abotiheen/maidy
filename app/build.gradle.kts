@@ -17,7 +17,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Load API key from local.properties
         val properties = org.jetbrains.kotlin.konan.properties.Properties()
         val localPropertiesFile = rootProject.file("local.properties")
         if (localPropertiesFile.exists()) {
@@ -56,7 +55,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -74,17 +72,18 @@ dependencies {
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.messaging.ktx)
     implementation(libs.firebase.analytics.ktx)
-    // App Check disabled - attestation failing with 403
-    // implementation(libs.firebase.appcheck.playintegrity)
-    // implementation(libs.firebase.appcheck.debug)
+    implementation(libs.firebase.vertexai)
+
+    // ADD THIS LINE
+    implementation(libs.kotlinx.serialization.json)
+
     implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
     implementation(libs.coil.compose)
     implementation(libs.accompanist.permissions)
     implementation("androidx.exifinterface:exifinterface:1.3.7")
-    // Gemini AI SDK (standalone)
-    implementation(libs.generativeai)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
