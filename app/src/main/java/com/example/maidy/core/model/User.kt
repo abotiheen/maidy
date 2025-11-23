@@ -8,5 +8,6 @@ data class User(
     val profileImageUrl: String = "",
     val phoneVerified: Boolean = false,
     val createdAt: Long = 0L,
-    val role: String = "customer"           // or "maid"
+    val role: String = "customer",          // or "maid"
+    val fcmToken: String = ""               // Firebase Cloud Messaging token for notifications
 )

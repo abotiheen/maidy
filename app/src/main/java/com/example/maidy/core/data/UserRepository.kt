@@ -144,4 +144,36 @@ class UserRepository(
             Result.failure(e)
         }
     }
+
+    // Update FCM token for push notifications
+    suspend fun updateFcmToken(userId: String, token: String): Result<Unit> {
+        return try {
+            println("📝 UserRepository: Updating FCM token for user: $userId")
+            firestore.collection("users")
+                .document(userId)
+                .update("fcmToken", token)
+                .await()
+            println("✅ UserRepository: FCM token updated successfully")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            println("❌ UserRepository: Failed to update FCM token - ${e.message}")
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+
+    // Get FCM token for a user
+    suspend fun getFcmToken(userId: String): Result<String> {
+        return try {
+            val userResult = getUserById(userId)
+            if (userResult.isSuccess) {
+                val user = userResult.getOrNull()!!
+                Result.success(user.fcmToken)
+            } else {
+                Result.failure(userResult.exceptionOrNull() ?: Exception("User not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

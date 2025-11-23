@@ -4,6 +4,7 @@ import com.example.maidy.core.model.Booking
 import com.example.maidy.core.model.BookingStatus
 import com.example.maidy.core.model.BookingType
 import com.example.maidy.core.model.RecurringType
+import com.example.maidy.core.service.NotificationService
 import com.example.maidy.core.util.BookingDateUtils
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -13,7 +14,8 @@ import kotlinx.coroutines.tasks.await
  * Repository for managing bookings in Firestore
  */
 class BookingRepository(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val notificationService: NotificationService? = null
 ) {
 
     /**
@@ -127,6 +129,11 @@ class BookingRepository(
     ): Result<Unit> {
         return try {
             println("📝 BookingRepository: Updating booking status - ID: $bookingId, New status: $newStatus")
+
+            // Get booking to retrieve userId
+            val bookingResult = getBookingById(bookingId)
+            val userId = bookingResult.getOrNull()?.userId
+
             firestore.collection("bookings")
                 .document(bookingId)
                 .update(
@@ -138,6 +145,13 @@ class BookingRepository(
                 .await()
 
             println("✅ BookingRepository: Booking status updated successfully")
+
+            // Send notification to user
+            if (userId != null && notificationService != null) {
+                println("📬 BookingRepository: Triggering notification for user: $userId")
+                notificationService.notifyBookingStatusChange(bookingId, userId, newStatus)
+            }
+
             Result.success(Unit)
         } catch (e: Exception) {
             println("❌ BookingRepository: Failed to update booking status - ${e.message}")

@@ -3,8 +3,11 @@ package com.example.maidy.core.di
 import com.example.maidy.core.data.AuthRepository
 import com.example.maidy.core.data.BookingRepository
 import com.example.maidy.core.data.MaidRepository
+import com.example.maidy.core.data.NotificationPreferencesManager
 import com.example.maidy.core.data.SessionManager
 import com.example.maidy.core.data.UserRepository
+import com.example.maidy.core.service.FcmTokenManager
+import com.example.maidy.core.service.NotificationService
 import com.example.maidy.core.util.ImageCompressor
 import com.example.maidy.feature.admin.AdminAddMaidViewModel
 import com.example.maidy.feature.adjust_recurring.AdjustRecurringViewModel
@@ -35,18 +38,25 @@ val appModule = module {
     // Session Manager
     single { SessionManager(androidContext()) }
     
+    // Notification Preferences
+    single { NotificationPreferencesManager(androidContext()) }
+    
     // Utilities
     single { ImageCompressor(androidContext()) }
+
+    // Services
+    single { FcmTokenManager(get()) }
+    single { NotificationService(get(), get()) }
 
     // Repositories
     single { AuthRepository(get()) }
     single { UserRepository(get(), get()) }
     single { MaidRepository(get(), get()) }
-    single { BookingRepository(get()) }
+    single { BookingRepository(get(), get()) }
 
     // ViewModels
-    viewModel { AuthViewModel(get(), get(), get()) }
-    viewModel { ProfileViewModel(get(), get(), get()) }
+    viewModel { AuthViewModel(get(), get(), get(), get()) }
+    viewModel { ProfileViewModel(get(), get(), get(), get(), get()) }
     viewModel { HomeViewModel(get(), get(), get()) }
     viewModel { AdminAddMaidViewModel(get(), get()) }
     viewModel { MaidListViewModel(get()) }

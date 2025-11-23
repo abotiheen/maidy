@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.example.maidy.core.components.NotificationPermissionHandler
 import com.example.maidy.feature.auth.AuthScreen
 import com.example.maidy.navigation.MaidyNavHost
 import com.example.maidy.ui.theme.MaidyTheme
@@ -22,6 +23,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MaidyTheme {
+                // Request notification permission
+                NotificationPermissionHandler(
+                    onPermissionGranted = {
+                        println("✅ MainActivity: Notification permission granted")
+                    },
+                    onPermissionDenied = {
+                        println("⚠️ MainActivity: Notification permission denied")
+                    }
+                )
+
                 MaidyNavHost(
                     navController = rememberNavController(),
                 )

@@ -8,6 +8,7 @@ import com.example.maidy.core.data.OtpState
 import com.example.maidy.core.data.SessionManager
 import com.example.maidy.core.data.UserRepository
 import com.example.maidy.core.model.User
+import com.example.maidy.core.service.FcmTokenManager
 import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -52,7 +53,8 @@ sealed class AuthEvent {
 class AuthViewModel(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val fcmTokenManager: FcmTokenManager
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -134,6 +136,11 @@ class AuthViewModel(
                 
                 // Save session
                 sessionManager.saveUserId(user.id)
+
+                // Register FCM token for notifications
+                viewModelScope.launch {
+                    fcmTokenManager.refreshToken(user.id)
+                }
                 
                 _uiState.update { 
                     it.copy(
@@ -291,6 +298,9 @@ class AuthViewModel(
         )
         
         userRepository.createUserProfile(userId, newUser)
+
+        // Register FCM token for notifications
+        fcmTokenManager.refreshToken(userId)
         
         _uiState.update { 
             it.copy(

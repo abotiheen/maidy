@@ -3,8 +3,10 @@ package com.example.maidy.feature.settings
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.maidy.core.data.NotificationPreferencesManager
 import com.example.maidy.core.data.SessionManager
 import com.example.maidy.core.data.UserRepository
+import com.example.maidy.core.service.FcmTokenManager
 import com.example.maidy.core.util.ImageCompressor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +22,9 @@ import kotlinx.coroutines.launch
 class ProfileViewModel(
     private val userRepository: UserRepository,
     private val sessionManager: SessionManager,
-    private val imageCompressor: ImageCompressor
+    private val imageCompressor: ImageCompressor,
+    private val notificationPreferences: NotificationPreferencesManager,
+    private val fcmTokenManager: FcmTokenManager
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -146,8 +150,72 @@ class ProfileViewModel(
     }
     
     private fun toggleNotifications(enabled: Boolean) {
-        _uiState.update { it.copy(areNotificationsEnabled = enabled) }
-        // TODO: Update notification preferences
+        viewModelScope.launch {
+            println("🔔 ProfileViewModel: Toggling notifications to: $enabled")
+
+            // Update local preference
+            notificationPreferences.setNotificationsEnabled(enabled)
+
+            val userId = sessionManager.getCurrentUserId()
+
+            if (userId != null) {
+                if (enabled) {
+                    // Enable notifications: Register FCM token
+                    println("🔔 ProfileViewModel: Enabling notifications - registering FCM token")
+                    val result = fcmTokenManager.refreshToken(userId)
+
+                    if (result.isSuccess) {
+                        println("✅ ProfileViewModel: FCM token registered successfully")
+                        _uiState.update {
+                            it.copy(
+                                areNotificationsEnabled = true,
+                                toastMessage = "🔔 Notifications enabled"
+                            )
+                        }
+                    } else {
+                        println("❌ ProfileViewModel: Failed to register FCM token")
+                        // Still update UI but show warning
+                        _uiState.update {
+                            it.copy(
+                                areNotificationsEnabled = true,
+                                toastMessage = "⚠️ Notifications enabled (token registration pending)"
+                            )
+                        }
+                    }
+                } else {
+                    // Disable notifications: Clear FCM token
+                    println("🔔 ProfileViewModel: Disabling notifications - clearing FCM token")
+                    val result = fcmTokenManager.deleteToken(userId)
+
+                    if (result.isSuccess) {
+                        println("✅ ProfileViewModel: FCM token cleared successfully")
+                        _uiState.update {
+                            it.copy(
+                                areNotificationsEnabled = false,
+                                toastMessage = "🔕 Notifications disabled"
+                            )
+                        }
+                    } else {
+                        println("❌ ProfileViewModel: Failed to clear FCM token")
+                        // Still update UI
+                        _uiState.update {
+                            it.copy(
+                                areNotificationsEnabled = false,
+                                toastMessage = "🔕 Notifications disabled"
+                            )
+                        }
+                    }
+                }
+            } else {
+                // No user logged in, just update local preference
+                _uiState.update {
+                    it.copy(
+                        areNotificationsEnabled = enabled,
+                        toastMessage = if (enabled) "🔔 Notifications enabled" else "🔕 Notifications disabled"
+                    )
+                }
+            }
+        }
     }
     
     private fun updateLanguage(language: String) {
@@ -248,12 +316,18 @@ class ProfileViewModel(
                 if (result.isSuccess) {
                     val user = result.getOrNull()!!
                     println("✅ ProfileViewModel: User loaded - Name: ${user.fullName}, Image: ${user.profileImageUrl}")
-                    _uiState.update { 
+
+                    // Load notification preference from local storage
+                    val notificationsEnabled = notificationPreferences.areNotificationsEnabled()
+                    println("🔔 ProfileViewModel: Notifications enabled: $notificationsEnabled")
+
+                    _uiState.update {
                         it.copy(
                             fullName = user.fullName,
                             phoneNumber = user.phoneNumber,
                             profileImageUri = user.profileImageUrl,
                             email = user.phoneNumber, // Using phone as email for now
+                            areNotificationsEnabled = notificationsEnabled,
                             isLoading = false
                         )
                     }
