@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -14,9 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.maidy.R
 import com.example.maidy.feature.home.components.*
+import com.example.maidy.ui.theme.BookingStatusCardBackground
+import com.example.maidy.ui.theme.BookingStatusOnWayIcon
 import com.example.maidy.ui.theme.MaidyBackgroundWhite
 import com.example.maidy.ui.theme.MaidyTheme
 import org.koin.androidx.compose.koinViewModel
@@ -37,15 +42,18 @@ fun HomeScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onNavigateToChat
+                onClick = onNavigateToChat,
+                containerColor = BookingStatusCardBackground
             ) {
                 Column(
                     horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
                     modifier = Modifier.padding(8.dp)
                 ) {
-                    Text(
-                        "🤖",
-                        style = androidx.compose.material3.MaterialTheme.typography.titleLarge
+                    Icon(
+                        painter = painterResource(R.drawable.robot),
+                        contentDescription = "Recurring Booking",
+                        tint = BookingStatusOnWayIcon,
+                        modifier = Modifier.size(28.dp)
                     )
                 }
             }

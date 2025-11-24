@@ -90,27 +90,6 @@ fun HomeHeader(
                     .clickable(onClick = onAdminClick),
                 tint = Color(0xFF4299E1)
             )
-
-            // Notification Bell
-            BadgedBox(
-            badge = {
-                if (hasNotifications) {
-                    Badge(
-                        containerColor = HomeNotificationBadge,
-                        modifier = Modifier.size(8.dp)
-                    )
-                }
-            }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground), // TODO: Replace with bell icon
-                    contentDescription = "Notifications",
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clickable(onClick = onNotificationClick),
-                    tint = Color.Black
-                )
-            }
         }
     }
 }
