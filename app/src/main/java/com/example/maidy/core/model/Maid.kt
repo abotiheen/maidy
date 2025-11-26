@@ -42,14 +42,12 @@ object ServiceOptions {
     )
 }
 
-// Predefined specialty tags
+// Predefined specialty tags (Maid Classes)
 object SpecialtyTags {
     val tags = listOf(
-        "Deep Cleaning",
-        "Eco-Friendly",
-        "Pet-Friendly",
-        "Move In/Out",
-        "Same Day Service"
+        "Gold",
+        "Silver",
+        "Bronze"
     )
 }
 

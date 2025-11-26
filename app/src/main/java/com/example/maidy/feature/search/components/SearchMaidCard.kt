@@ -194,7 +194,7 @@ fun SearchMaidCardPreview() {
                     verified = true,
                     averageRating = 4.9,
                     reviewCount = 125,
-                    specialtyTag = "Deep Cleaning",
+                    specialtyTag = "Gold",
                     hourlyRate = 25.0,
                     available = true
                 ),
@@ -209,8 +209,23 @@ fun SearchMaidCardPreview() {
                     verified = false,
                     averageRating = 4.5,
                     reviewCount = 67,
-                    specialtyTag = "Eco-Friendly",
+                    specialtyTag = "Silver",
                     hourlyRate = 22.0,
+                    available = true
+                ),
+                onClick = {}
+            )
+
+            SearchMaidCard(
+                maid = Maid(
+                    id = "3",
+                    fullName = "Sarah Ahmed",
+                    profileImageUrl = "",
+                    verified = false,
+                    averageRating = 4.2,
+                    reviewCount = 45,
+                    specialtyTag = "Bronze",
+                    hourlyRate = 18.0,
                     available = true
                 ),
                 onClick = {}

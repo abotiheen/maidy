@@ -147,15 +147,6 @@ private fun ProfileScreenContent(
         )
         
         Spacer(modifier = Modifier.height(12.dp))
-        
-        // Language Selection
-        SettingNavigationItem(
-            icon = Icons.Outlined.Create,
-            title = uiState.selectedLanguage,
-            onClick = { onEvent(ProfileEvent.UpdateLanguage("English")) }
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
 
         // Log Out Button
         LogOutButton(

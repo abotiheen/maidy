@@ -218,35 +218,29 @@ fun MaidListCard(
 }
 
 /**
- * Returns the background and text colors for a given specialty tag
+ * Returns the background and text colors for a given specialty tag (Maid Class)
  */
 @Composable
 private fun getSpecialtyTagColors(specialtyTag: String): Pair<Color, Color> {
     return when (specialtyTag) {
-        "Deep Cleaning" -> Pair(
-            MaidListServiceChipDeepCleaningBg,
-            MaidListServiceChipDeepCleaningText
+        "Gold" -> Pair(
+            Color(0xFFFFF9E6),  // Light gold/cream background
+            Color(0xFFD4AF37)   // Rich gold text
         )
-        "Eco-Friendly" -> Pair(
-            MaidListServiceChipEcoFriendlyBg,
-            MaidListServiceChipEcoFriendlyText
+
+        "Silver" -> Pair(
+            Color(0xFFF5F5F5),  // Light silver/gray background
+            Color(0xFF9E9E9E)   // Silver gray text
         )
-        "Pet-Friendly" -> Pair(
-            MaidListServiceChipPetFriendlyBg,
-            MaidListServiceChipPetFriendlyText
+
+        "Bronze" -> Pair(
+            Color(0xFFFFF3E0),  // Light bronze/peach background
+            Color(0xFFCD7F32)   // Bronze text
         )
-        "Move In/Out" -> Pair(
-            MaidListServiceChipMoveInOutBg,
-            MaidListServiceChipMoveInOutText
-        )
-        "Same Day Service" -> Pair(
-            // Using a purple/lavender color scheme for Same Day Service
-            Color(0xFFE8E4F3),  // Light purple background
-            Color(0xFF6C4AB6)   // Purple text
-        )
+
         else -> Pair(
-            MaidListServiceChipDeepCleaningBg,
-            MaidListServiceChipDeepCleaningText
+            Color(0xFFF5F5F5),  // Default light gray
+            Color(0xFF757575)   // Default dark gray
         )
     }
 }
@@ -261,89 +255,59 @@ fun MaidListCardPreview() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Deep Cleaning", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text("Gold Class", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         MaidListCard(
             maid = Maid(
                 id = "1",
                 fullName = "Hala Al-Fahad",
                 averageRating = 4.9,
                 reviewCount = 120,
-                specialtyTag = "Deep Cleaning",
+                specialtyTag = "Gold",
                 profileImageUrl = "",
                 available = true
             ),
             onSelectClick = {},
             onViewDetailsClick = {}
         )
-        
-        Text("Eco-Friendly", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+
+        Text("Silver Class", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         MaidListCard(
             maid = Maid(
                 id = "2",
                 fullName = "Sara Mohammed",
-                averageRating = 4.8,
-                reviewCount = 103,
-                specialtyTag = "Eco-Friendly",
+                averageRating = 4.5,
+                reviewCount = 85,
+                specialtyTag = "Silver",
                 profileImageUrl = "",
                 available = true
             ),
             onSelectClick = {},
             onViewDetailsClick = {}
         )
-        
-        Text("Pet-Friendly", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+
+        Text("Bronze Class", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         MaidListCard(
             maid = Maid(
                 id = "3",
                 fullName = "Fatima Ali",
-                averageRating = 4.7,
-                reviewCount = 88,
-                specialtyTag = "Pet-Friendly",
+                averageRating = 4.2,
+                reviewCount = 50,
+                specialtyTag = "Bronze",
                 profileImageUrl = "",
                 available = true
             ),
             onSelectClick = {},
             onViewDetailsClick = {}
         )
-        
-        Text("Move In/Out", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+
+        Text("Gold Class - Not Available", fontWeight = FontWeight.Bold, fontSize = 16.sp)
         MaidListCard(
             maid = Maid(
                 id = "4",
-                fullName = "Layla Hassan",
-                averageRating = 4.6,
-                reviewCount = 75,
-                specialtyTag = "Move In/Out",
-                profileImageUrl = "",
-                available = true
-            ),
-            onSelectClick = {},
-            onViewDetailsClick = {}
-        )
-        
-        Text("Same Day Service", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        MaidListCard(
-            maid = Maid(
-                id = "5",
-                fullName = "Noor Ahmed",
-                averageRating = 4.9,
-                reviewCount = 145,
-                specialtyTag = "Same Day Service",
-                profileImageUrl = "",
-                available = true
-            ),
-            onSelectClick = {},
-            onViewDetailsClick = {}
-        )
-        
-        Text("Not Available Maid", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        MaidListCard(
-            maid = Maid(
-                id = "6",
                 fullName = "Aisha Rahman",
                 averageRating = 4.8,
                 reviewCount = 92,
-                specialtyTag = "Deep Cleaning",
+                specialtyTag = "Gold",
                 profileImageUrl = "",
                 available = false
             ),

@@ -63,20 +63,18 @@ fun FilterChipsRowPreview() {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            "Filter Chips Row - With Specialty Tags",
+            "Filter Chips Row - With Maid Classes",
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
             modifier = Modifier.padding(16.dp)
         )
-        
-        // Preview with specialty tag filters
+
+        // Preview with maid class filters
         FilterChipsRow(
             filters = listOf(
-                FilterOption("1", "Deep Cleaning", isSelected = false),
-                FilterOption("2", "Eco-Friendly", isSelected = true),
-                FilterOption("3", "Pet-Friendly", isSelected = false),
-                FilterOption("4", "Move In/Out", isSelected = false),
-                FilterOption("5", "Same Day Service", isSelected = false),
+                FilterOption("1", "Gold", isSelected = false),
+                FilterOption("2", "Silver", isSelected = true),
+                FilterOption("3", "Bronze", isSelected = false),
             ),
             onFilterClick = {}
         )

@@ -158,9 +158,9 @@ fun MaidListScreenPreview() {
     // Preview with placeholder data
     val previewState = MaidListUiState(
         filters = listOf(
-            FilterOption("1", "Deep Cleaning", isSelected = false),
-            FilterOption("2", "Eco-Friendly", isSelected = true),
-            FilterOption("3", "Pet-Friendly", isSelected = false),
+            FilterOption("1", "Gold", isSelected = false),
+            FilterOption("2", "Silver", isSelected = true),
+            FilterOption("3", "Bronze", isSelected = false),
         ),
         filteredMaids = listOf(
             com.example.maidy.core.model.Maid(
@@ -168,16 +168,16 @@ fun MaidListScreenPreview() {
                 fullName = "Hala Al-Fahad",
                 averageRating = 4.9,
                 reviewCount = 120,
-                specialtyTag = "Deep Cleaning",
+                specialtyTag = "Gold",
                 profileImageUrl = "",
                 available = true
             ),
             com.example.maidy.core.model.Maid(
                 id = "2",
                 fullName = "Sara Mohammed",
-                averageRating = 4.8,
-                reviewCount = 95,
-                specialtyTag = "Eco-Friendly",
+                averageRating = 4.5,
+                reviewCount = 85,
+                specialtyTag = "Silver",
                 profileImageUrl = "",
                 available = true
             ),
@@ -208,7 +208,7 @@ fun MaidListScreenEmptyPreview() {
         uiState = MaidListUiState(
             filteredMaids = emptyList(),
             filters = listOf(
-                FilterOption("1", "Pet-Friendly", isSelected = true),
+                FilterOption("1", "Gold", isSelected = true),
             )
         ),
         onEvent = {},

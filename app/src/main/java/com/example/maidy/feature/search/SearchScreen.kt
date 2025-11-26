@@ -311,7 +311,7 @@ fun SearchScreenWithResultsPreview() {
                         verified = true,
                         averageRating = 4.9,
                         reviewCount = 125,
-                        specialtyTag = "Deep Cleaning",
+                        specialtyTag = "Gold",
                         hourlyRate = 25.0,
                         available = true
                     ),
@@ -320,10 +320,10 @@ fun SearchScreenWithResultsPreview() {
                         fullName = "Elena Martinez",
                         profileImageUrl = "",
                         verified = false,
-                        averageRating = 4.7,
-                        reviewCount = 89,
-                        specialtyTag = "Eco-Friendly",
-                        hourlyRate = 23.0,
+                        averageRating = 4.5,
+                        reviewCount = 75,
+                        specialtyTag = "Silver",
+                        hourlyRate = 20.0,
                         available = true
                     )
                 ),

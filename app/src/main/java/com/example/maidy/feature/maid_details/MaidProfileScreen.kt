@@ -215,7 +215,7 @@ fun MaidProfileScreenPreview() {
                     )
                 ),
                 pricePerHour = 25.0,
-                specialtyTag = "Deep Cleaning",
+                specialtyTag = "Gold",
                 isAvailable = true
             ),
             selectedTab = ProfileTab.ABOUT
@@ -252,7 +252,7 @@ fun MaidProfileScreenServicesPreview() {
                 ),
                 reviews = listOf(),
                 pricePerHour = 25.0,
-                specialtyTag = "Deep Cleaning",
+                specialtyTag = "Silver",
                 isAvailable = true
             ),
             selectedTab = ProfileTab.SERVICES

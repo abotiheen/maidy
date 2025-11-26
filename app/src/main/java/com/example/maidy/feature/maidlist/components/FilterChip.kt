@@ -88,31 +88,24 @@ fun FilterChip(
 }
 
 /**
- * Returns the background and text colors for filter chips based on specialty tag
+ * Returns the background and text colors for filter chips based on maid class
  */
 @Composable
 private fun getFilterChipColors(label: String): Pair<Color, Color> {
     return when (label) {
-        "Deep Cleaning" -> Pair(
-            MaidListServiceChipDeepCleaningBg,
-            MaidListServiceChipDeepCleaningText
+        "Gold" -> Pair(
+            Color(0xFFFFF9E6),  // Light gold/cream background
+            Color(0xFFD4AF37)   // Rich gold text
         )
-        "Eco-Friendly" -> Pair(
-            MaidListServiceChipEcoFriendlyBg,
-            MaidListServiceChipEcoFriendlyText
+
+        "Silver" -> Pair(
+            Color(0xFFF5F5F5),  // Light silver/gray background
+            Color(0xFF9E9E9E)   // Silver gray text
         )
-        "Pet-Friendly" -> Pair(
-            MaidListServiceChipPetFriendlyBg,
-            MaidListServiceChipPetFriendlyText
-        )
-        "Move In/Out" -> Pair(
-            MaidListServiceChipMoveInOutBg,
-            MaidListServiceChipMoveInOutText
-        )
-        "Same Day Service" -> Pair(
-            // Using a purple/lavender color scheme for Same Day Service
-            Color(0xFFE8E4F3),  // Light purple background
-            Color(0xFF6C4AB6)   // Purple text
+
+        "Bronze" -> Pair(
+            Color(0xFFFFF3E0),  // Light bronze/peach background
+            Color(0xFFCD7F32)   // Bronze text
         )
         else -> Pair(
             MaidListFilterChipSelectedBackground,
@@ -131,27 +124,22 @@ fun FilterChipPreview() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Specialty Tags - Unselected", fontWeight = FontWeight.Bold)
+        Text("Maid Classes - Unselected", fontWeight = FontWeight.Bold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(label = "Deep Cleaning", isSelected = false, onClick = {})
-            FilterChip(label = "Eco-Friendly", isSelected = false, onClick = {})
+            FilterChip(label = "Gold", isSelected = false, onClick = {})
+            FilterChip(label = "Silver", isSelected = false, onClick = {})
+            FilterChip(label = "Bronze", isSelected = false, onClick = {})
         }
-        
-        Text("Specialty Tags - Selected", fontWeight = FontWeight.Bold)
+
+        Text("Maid Classes - Selected", fontWeight = FontWeight.Bold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(label = "Deep Cleaning", isSelected = true, onClick = {})
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(label = "Eco-Friendly", isSelected = true, onClick = {})
+            FilterChip(label = "Gold", isSelected = true, onClick = {})
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(label = "Pet-Friendly", isSelected = true, onClick = {})
+            FilterChip(label = "Silver", isSelected = true, onClick = {})
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(label = "Move In/Out", isSelected = true, onClick = {})
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(label = "Same Day Service", isSelected = true, onClick = {})
+            FilterChip(label = "Bronze", isSelected = true, onClick = {})
         }
         
         Text("Generic Filter Chip with Icon", fontWeight = FontWeight.Bold)
