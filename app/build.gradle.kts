@@ -73,8 +73,11 @@ dependencies {
     implementation(libs.firebase.messaging.ktx)
     implementation(libs.firebase.analytics.ktx)
     implementation(libs.firebase.vertexai)
+    implementation(libs.firebase.appcheck.playintegrity)
+    implementation(libs.firebase.appcheck.debug)
+//    implementation(libs.recaptcha)
 
-    // ADD THIS LINE
+
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.koin.core)

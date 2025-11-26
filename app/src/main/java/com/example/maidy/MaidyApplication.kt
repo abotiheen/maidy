@@ -1,11 +1,16 @@
 package com.example.maidy
 
 import android.app.Application
+import android.content.pm.ApplicationInfo
 import com.example.maidy.core.di.appModule
 import com.example.maidy.core.util.NotificationHelper
 import com.google.firebase.FirebaseApp
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import android.util.Log
 
 class MaidyApplication : Application() {
     override fun onCreate() {
@@ -14,14 +19,24 @@ class MaidyApplication : Application() {
         // Initialize Firebase
         FirebaseApp.initializeApp(this)
 
-        // App Check COMPLETELY DISABLED
-        // Reason: Attestation failing with 403, causing OTP to fail
-        // TODO: Fix App Check configuration before production:
-        //  1. Ensure SHA-1/SHA-256 are correct
-        //  2. Link Play Integrity API to Firebase project
-        //  3. Register debug tokens for development
-        //  4. Set App Check to "Unenforced" in Firebase Console during development
-        //  5. Enable enforcement only for production builds
+        // Initialize App Check
+        val firebaseAppCheck = FirebaseAppCheck.getInstance()
+        val isDebuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+
+        Log.d("AppCheckSetup", "isDebuggable (Flag): $isDebuggable")
+
+        firebaseAppCheck.installAppCheckProviderFactory(
+            if (isDebuggable) {
+                Log.d("AppCheckSetup", "Installing DebugAppCheckProviderFactory")
+                // Use Debug provider for local development
+                // Look for the debug token in Logcat and add it to Firebase Console
+                DebugAppCheckProviderFactory.getInstance()
+            } else {
+                Log.d("AppCheckSetup", "Installing PlayIntegrityAppCheckProviderFactory")
+                // Use Play Integrity for production
+                PlayIntegrityAppCheckProviderFactory.getInstance()
+            }
+        )
 
         // Initialize Koin
         startKoin {
