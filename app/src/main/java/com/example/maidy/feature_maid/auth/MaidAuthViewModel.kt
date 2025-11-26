@@ -147,9 +147,9 @@ class MaidAuthViewModel(
                 // Save session
                 sessionManager.saveUserId(maid.id)
 
-                // Register FCM token for notifications
+                // Register FCM token for notifications (maid collection)
                 viewModelScope.launch {
-                    fcmTokenManager.refreshToken(maid.id)
+                    fcmTokenManager.refreshToken(maid.id, isCustomer = false)
                 }
 
                 _uiState.update {
@@ -318,8 +318,8 @@ class MaidAuthViewModel(
 
         maidRepository.createMaidProfile(userId, newMaid)
 
-        // Register FCM token for notifications
-        fcmTokenManager.refreshToken(userId)
+        // Register FCM token for notifications (maid collection)
+        fcmTokenManager.refreshToken(userId, isCustomer = false)
 
         _uiState.update {
             it.copy(

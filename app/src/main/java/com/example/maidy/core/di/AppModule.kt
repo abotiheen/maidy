@@ -19,6 +19,7 @@ import com.example.maidy.feature.chat.ChatViewModel
 import com.example.maidy.feature.edit_profile.EditProfileViewModel
 import com.example.maidy.feature.rating.RatingViewModel
 import com.example.maidy.feature_maid.auth.MaidAuthViewModel
+import com.example.maidy.feature_maid.profile.MaidProfileViewModel as MaidOwnProfileViewModel
 import com.example.maidy.feature.booking.BookingStatusViewModel
 import com.example.maidy.feature.booking_details.BookingDetailsViewModel
 import com.example.maidy.feature.home.HomeViewModel
@@ -49,7 +50,7 @@ val appModule = module {
     single { ImageCompressor(androidContext()) }
 
     // Services
-    single { FcmTokenManager(get()) }
+    single { FcmTokenManager(get(), get()) }  // Now accepts both UserRepository and MaidRepository
     single { NotificationService(get(), get()) }
     single { GeminiChatService(get(), get(), get()) }
 
@@ -63,6 +64,7 @@ val appModule = module {
     // ViewModels
     viewModel { AuthViewModel(get(), get(), get(), get()) }
     viewModel { MaidAuthViewModel(get(), get(), get(), get()) }
+    viewModel { MaidOwnProfileViewModel(get(), get(), get(), get(), get()) }
     viewModel { ProfileViewModel(get(), get(), get(), get(), get()) }
     viewModel { HomeViewModel(get(), get(), get()) }
     viewModel { AdminAddMaidViewModel(get(), get()) }

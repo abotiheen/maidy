@@ -131,7 +131,7 @@ fun MaidNavHost(
             // Profile Screen - Maid Profile and Settings
             composable(route = MaidScreen.Profile.route) {
                 MaidProfileScreen(
-                    onLogout = {
+                    onNavigateToAuth = {
                         navController.navigate(MaidScreen.Auth.route) {
                             // Clear all back stack entries
                             popUpTo(0) {
@@ -140,6 +140,9 @@ fun MaidNavHost(
                             // Single instance of auth screen
                             launchSingleTop = true
                         }
+                    },
+                    onNavigateToEditProfile = {
+                        // TODO: Navigate to edit profile screen when created
                     }
                 )
             }

@@ -1,35 +1,43 @@
 package com.example.maidy.core.service
 
+import com.example.maidy.core.data.MaidRepository
 import com.example.maidy.core.data.UserRepository
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.tasks.await
 
 /**
  * Manager for FCM token operations
+ * Supports both users and maids
  */
 class FcmTokenManager(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val maidRepository: MaidRepository
 ) {
 
     /**
      * Get and save current FCM token for a user
      */
-    suspend fun refreshToken(userId: String): Result<String> {
+    suspend fun refreshToken(userId: String, isCustomer: Boolean = true): Result<String> {
         return try {
-            println("🔄 FcmTokenManager: Refreshing FCM token for user: $userId")
+            val userType = if (isCustomer) "customer" else "maid"
+            println("🔄 FcmTokenManager: Refreshing FCM token for $userType: $userId")
 
             // Get current FCM token
             val token = FirebaseMessaging.getInstance().token.await()
             println("🔑 FcmTokenManager: Got FCM token: $token")
 
-            // Save to Firestore
-            val result = userRepository.updateFcmToken(userId, token)
+            // Save to Firestore - different collections based on user type
+            val result = if (isCustomer) {
+                userRepository.updateFcmToken(userId, token)
+            } else {
+                maidRepository.updateFcmToken(userId, token)
+            }
 
             if (result.isSuccess) {
-                println("✅ FcmTokenManager: Token saved successfully")
+                println("✅ FcmTokenManager: Token saved successfully for $userType")
                 Result.success(token)
             } else {
-                println("❌ FcmTokenManager: Failed to save token")
+                println("❌ FcmTokenManager: Failed to save token for $userType")
                 Result.failure(result.exceptionOrNull() ?: Exception("Failed to save token"))
             }
         } catch (e: Exception) {
@@ -42,17 +50,25 @@ class FcmTokenManager(
     /**
      * Delete FCM token (useful for logout)
      */
-    suspend fun deleteToken(userId: String): Result<Unit> {
+    suspend fun deleteToken(userId: String, isCustomer: Boolean = true): Result<Unit> {
         return try {
-            println("🗑️ FcmTokenManager: Deleting FCM token for user: $userId")
+            val userType = if (isCustomer) "customer" else "maid"
+            println("🗑️ FcmTokenManager: Deleting FCM token for $userType: $userId")
 
             // Delete token from Firebase
             FirebaseMessaging.getInstance().deleteToken().await()
 
-            // Clear token in Firestore
-            userRepository.updateFcmToken(userId, "")
+            // Clear token in Firestore - different collections based on user type
+            val result = if (isCustomer) {
+                userRepository.updateFcmToken(userId, "")
+            } else {
+                maidRepository.updateFcmToken(userId, "")
+            }
 
-            println("✅ FcmTokenManager: Token deleted successfully")
+            if (result.isSuccess) {
+                println("✅ FcmTokenManager: Token deleted successfully for $userType")
+            }
+
             Result.success(Unit)
         } catch (e: Exception) {
             println("❌ FcmTokenManager: Error deleting token - ${e.message}")
