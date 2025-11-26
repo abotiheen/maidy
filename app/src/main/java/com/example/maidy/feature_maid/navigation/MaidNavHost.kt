@@ -19,6 +19,7 @@ import com.example.maidy.R
 import com.example.maidy.feature_maid.auth.MaidAppBackgroundLight
 import com.example.maidy.feature_maid.auth.MaidAppTextPrimary
 import com.example.maidy.feature_maid.auth.MaidAuthScreen
+import com.example.maidy.feature_maid.edit_profile.MaidEditProfileScreen
 import com.example.maidy.feature_maid.home.MaidHomeScreen
 import com.example.maidy.feature_maid.profile.MaidProfileScreen
 import com.example.maidy.feature_maid.terms.MaidTermsAndConditionsScreen
@@ -114,18 +115,7 @@ fun MaidNavHost(
 
             // Home Screen - Main Dashboard for Maids
             composable(route = MaidScreen.Home.route) {
-                MaidHomeScreen(
-                    onLogout = {
-                        navController.navigate(MaidScreen.Auth.route) {
-                            // Clear all back stack entries
-                            popUpTo(0) {
-                                inclusive = true
-                            }
-                            // Single instance of auth screen
-                            launchSingleTop = true
-                        }
-                    }
-                )
+                MaidHomeScreen()
             }
 
             // Profile Screen - Maid Profile and Settings
@@ -142,7 +132,16 @@ fun MaidNavHost(
                         }
                     },
                     onNavigateToEditProfile = {
-                        // TODO: Navigate to edit profile screen when created
+                        navController.navigate(MaidScreen.EditProfile.route)
+                    }
+                )
+            }
+
+            // Edit Profile Screen - Edit Maid Profile Details
+            composable(route = MaidScreen.EditProfile.route) {
+                MaidEditProfileScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
                     }
                 )
             }

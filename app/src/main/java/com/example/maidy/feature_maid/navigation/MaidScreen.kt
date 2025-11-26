@@ -32,6 +32,11 @@ sealed class MaidScreen(
      * Terms and Conditions screen - display service provider terms
      */
     data object TermsAndConditions : MaidScreen("maid_terms_and_conditions", "Terms and Conditions")
+
+    /**
+     * Edit Profile screen - edit maid profile details
+     */
+    data object EditProfile : MaidScreen("maid_edit_profile", "Edit Profile")
 }
 
 /**
@@ -42,6 +47,7 @@ fun getMaidScreenFromRoute(route: String?): MaidScreen {
         route == null -> MaidScreen.Auth
         route.startsWith("maid_auth") -> MaidScreen.Auth
         route.startsWith("maid_home") -> MaidScreen.Home
+        route.startsWith("maid_edit_profile") -> MaidScreen.EditProfile
         route.startsWith("maid_profile") -> MaidScreen.Profile
         route.startsWith("maid_terms_and_conditions") -> MaidScreen.TermsAndConditions
         else -> MaidScreen.Auth

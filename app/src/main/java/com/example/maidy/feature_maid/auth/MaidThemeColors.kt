@@ -15,8 +15,8 @@ val MaidAppBackgroundWhite = Color(0xFFFFFFFF)    // Pure white
 val MaidAppBackgroundDark = Color(0xFF1B3A1E)     // Dark green for dark mode
 
 // Text Colors
-val MaidAppTextPrimary = Color(0xFF1B5E20)        // Dark green for primary text
-val MaidAppTextSecondary = Color(0xFF7B9B7F)      // Muted green for secondary text
+val MaidAppTextPrimary = Color(0xFF000000)        // Pure black for primary text
+val MaidAppTextSecondary = Color(0xFF6B7280)      // Medium gray for secondary text
 val MaidAppTextLight = Color(0xFFFFFFFF)          // White text
 
 // Border & Divider Colors

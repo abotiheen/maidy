@@ -333,4 +333,23 @@ class MaidRepository(
             Result.failure(e)
         }
     }
+
+    /**
+     * Update maid's availability status
+     */
+    suspend fun updateMaidAvailability(maidId: String, isAvailable: Boolean): Result<Unit> {
+        return try {
+            println("📝 MaidRepository: Updating availability for maid: $maidId to $isAvailable")
+            firestore.collection("maids")
+                .document(maidId)
+                .update("available", isAvailable)
+                .await()
+            println("✅ MaidRepository: Availability updated successfully")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            println("❌ MaidRepository: Failed to update availability - ${e.message}")
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
 }
