@@ -7,6 +7,7 @@ data class Maid(
     val profileImageUrl: String = "",
     val phoneNumber: String = "",
     val phoneVerified: Boolean = false,
+    val password: String = "",                // Password for authentication
     val bio: String = "",
     val verified: Boolean = false,
     val averageRating: Double = 0.0,
@@ -14,7 +15,8 @@ data class Maid(
     val services: List<String> = emptyList(),
     val specialtyTag: String = "",
     val hourlyRate: Double = 0.0,
-    val available: Boolean = true
+    val available: Boolean = true,
+    val fcmToken: String = ""                 // Firebase Cloud Messaging token for notifications
 )
 
 data class MaidReview(
@@ -50,4 +52,3 @@ object SpecialtyTags {
         "Bronze"
     )
 }
-

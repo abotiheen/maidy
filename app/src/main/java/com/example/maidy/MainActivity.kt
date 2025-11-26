@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.example.maidy.core.components.NotificationPermissionHandler
 import com.example.maidy.feature.auth.AuthScreen
+import com.example.maidy.feature_maid.navigation.MaidNavHost
 import com.example.maidy.navigation.MaidyNavHost
 import com.example.maidy.ui.theme.MaidyTheme
 
@@ -33,7 +34,7 @@ class MainActivity : ComponentActivity() {
                     }
                 )
 
-                MaidyNavHost(
+                MaidNavHost(
                     navController = rememberNavController(),
                 )
             }

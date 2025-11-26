@@ -21,22 +21,28 @@ class MaidyApplication : Application() {
 
         // Initialize App Check
         val firebaseAppCheck = FirebaseAppCheck.getInstance()
+
+        // TEMPORARY: Use Debug provider for testing locally installed APKs
+        // Play Integrity requires installation from Play Store
+        Log.d("AppCheckSetup", "Using Debug App Check Provider for testing")
+
+        firebaseAppCheck.installAppCheckProviderFactory(
+            DebugAppCheckProviderFactory.getInstance()
+        )
+
+        /* TODO: Switch to Play Integrity after uploading to Play Store:
         val isDebuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
-
-        Log.d("AppCheckSetup", "isDebuggable (Flag): $isDebuggable")
-
+        
         firebaseAppCheck.installAppCheckProviderFactory(
             if (isDebuggable) {
                 Log.d("AppCheckSetup", "Installing DebugAppCheckProviderFactory")
-                // Use Debug provider for local development
-                // Look for the debug token in Logcat and add it to Firebase Console
                 DebugAppCheckProviderFactory.getInstance()
             } else {
                 Log.d("AppCheckSetup", "Installing PlayIntegrityAppCheckProviderFactory")
-                // Use Play Integrity for production
                 PlayIntegrityAppCheckProviderFactory.getInstance()
             }
         )
+        */
 
         // Initialize Koin
         startKoin {

@@ -29,8 +29,18 @@ android {
         )
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("/Users/zain_abotiheen/maidy.jks")  // Update this path
+            storePassword = "maidy12"  // Update this
+            keyAlias = "key0"
+            keyPassword = "maidy12"  // Update this
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
