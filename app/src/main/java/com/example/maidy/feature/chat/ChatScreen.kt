@@ -66,7 +66,7 @@ fun ChatScreen(
 
             // Input section
             Surface(
-                shadowElevation = 8.dp,
+                shadowElevation = 0.dp,
                 color = Color.White,
                 modifier = Modifier.fillMaxWidth()
             ) {
