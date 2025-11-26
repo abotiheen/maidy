@@ -12,13 +12,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import com.example.maidy.R
 import com.example.maidy.feature_maid.auth.MaidAppBackgroundLight
 import com.example.maidy.feature_maid.auth.MaidAppTextPrimary
 import com.example.maidy.feature_maid.auth.MaidAuthScreen
+import com.example.maidy.feature_maid.booking_details.MaidBookingDetailsScreen
 import com.example.maidy.feature_maid.edit_profile.MaidEditProfileScreen
 import com.example.maidy.feature_maid.home.MaidHomeScreen
 import com.example.maidy.feature_maid.profile.MaidProfileScreen
@@ -115,7 +118,11 @@ fun MaidNavHost(
 
             // Home Screen - Main Dashboard for Maids
             composable(route = MaidScreen.Home.route) {
-                MaidHomeScreen()
+                MaidHomeScreen(
+                    onBookingClick = { bookingId ->
+                        navController.navigate(MaidScreen.bookingDetails(bookingId))
+                    }
+                )
             }
 
             // Profile Screen - Maid Profile and Settings
@@ -149,6 +156,20 @@ fun MaidNavHost(
             // Terms and Conditions Screen - Service Provider Terms
             composable(route = MaidScreen.TermsAndConditions.route) {
                 MaidTermsAndConditionsScreen()
+            }
+
+            // Booking Details Screen - View and Manage Booking
+            composable(
+                route = MaidScreen.BOOKING_DETAILS_ROUTE,
+                arguments = listOf(navArgument("bookingId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val bookingId = backStackEntry.arguments?.getString("bookingId") ?: ""
+                MaidBookingDetailsScreen(
+                    bookingId = bookingId,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }

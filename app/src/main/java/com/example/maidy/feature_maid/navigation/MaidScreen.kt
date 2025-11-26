@@ -37,6 +37,14 @@ sealed class MaidScreen(
      * Edit Profile screen - edit maid profile details
      */
     data object EditProfile : MaidScreen("maid_edit_profile", "Edit Profile")
+
+    /**
+     * Booking Details screen - view and manage specific booking
+     */
+    companion object {
+        fun bookingDetails(bookingId: String) = "maid_booking_details/$bookingId"
+        const val BOOKING_DETAILS_ROUTE = "maid_booking_details/{bookingId}"
+    }
 }
 
 /**
@@ -49,6 +57,7 @@ fun getMaidScreenFromRoute(route: String?): MaidScreen {
         route.startsWith("maid_home") -> MaidScreen.Home
         route.startsWith("maid_edit_profile") -> MaidScreen.EditProfile
         route.startsWith("maid_profile") -> MaidScreen.Profile
+        route.startsWith("maid_booking_details") -> MaidScreen.EditProfile // Placeholder
         route.startsWith("maid_terms_and_conditions") -> MaidScreen.TermsAndConditions
         else -> MaidScreen.Auth
     }

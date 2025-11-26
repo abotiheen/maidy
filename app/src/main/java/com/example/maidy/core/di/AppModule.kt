@@ -19,6 +19,7 @@ import com.example.maidy.feature.chat.ChatViewModel
 import com.example.maidy.feature.edit_profile.EditProfileViewModel
 import com.example.maidy.feature.rating.RatingViewModel
 import com.example.maidy.feature_maid.auth.MaidAuthViewModel
+import com.example.maidy.feature_maid.booking_details.MaidBookingDetailsViewModel
 import com.example.maidy.feature_maid.profile.MaidProfileViewModel as MaidOwnProfileViewModel
 import com.example.maidy.feature_maid.edit_profile.MaidEditProfileViewModel
 import com.example.maidy.feature_maid.home.MaidHomeViewModel
@@ -69,6 +70,7 @@ val appModule = module {
     viewModel { MaidOwnProfileViewModel(get(), get(), get(), get(), get()) }
     viewModel { MaidEditProfileViewModel(get(), get(), get(), get()) }
     viewModel { MaidHomeViewModel(get(), get(), get()) }
+    viewModel { (bookingId: String) -> MaidBookingDetailsViewModel(bookingId, get()) }
     viewModel { ProfileViewModel(get(), get(), get(), get(), get()) }
     viewModel { HomeViewModel(get(), get(), get()) }
     viewModel { AdminAddMaidViewModel(get(), get()) }

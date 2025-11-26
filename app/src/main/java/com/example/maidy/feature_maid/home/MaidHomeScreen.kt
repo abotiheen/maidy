@@ -2,6 +2,7 @@ package com.example.maidy.feature_maid.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,6 +39,7 @@ import java.util.*
 @Composable
 fun MaidHomeScreen(
     viewModel: MaidHomeViewModel = koinViewModel(),
+    onBookingClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -120,7 +122,10 @@ fun MaidHomeScreen(
 
         // Bookings list
         items(uiState.recentBookings) { booking ->
-            MaidBookingItem(booking = booking)
+            MaidBookingItem(
+                booking = booking,
+                onClick = { onBookingClick(booking.id) }
+            )
         }
 
         // Empty state
@@ -327,9 +332,11 @@ private fun MaidAvailabilityCard(
 }
 
 @Composable
-private fun MaidBookingItem(booking: Booking) {
+private fun MaidBookingItem(booking: Booking, onClick: () -> Unit = {}) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
