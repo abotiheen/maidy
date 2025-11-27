@@ -40,6 +40,7 @@ import java.util.*
 fun MaidHomeScreen(
     viewModel: MaidHomeViewModel = koinViewModel(),
     onBookingClick: (String) -> Unit = {},
+    onNavigateToAllBookings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -77,7 +78,7 @@ fun MaidHomeScreen(
         // Manage Bookings Button
         item {
             Button(
-                onClick = { /* TODO: Navigate to bookings */ },
+                onClick = onNavigateToAllBookings,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -332,9 +333,9 @@ private fun MaidAvailabilityCard(
 }
 
 @Composable
-private fun MaidBookingItem(booking: Booking, onClick: () -> Unit = {}) {
+internal fun MaidBookingItem(booking: Booking, onClick: () -> Unit = {}, modifier: Modifier = Modifier) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = Color.White),

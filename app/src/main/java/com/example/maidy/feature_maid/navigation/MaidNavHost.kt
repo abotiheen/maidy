@@ -20,6 +20,7 @@ import androidx.navigation.navArgument
 import com.example.maidy.R
 import com.example.maidy.feature_maid.auth.MaidAppBackgroundLight
 import com.example.maidy.feature_maid.auth.MaidAppTextPrimary
+import com.example.maidy.feature_maid.all_bookings.MaidAllBookingsScreen
 import com.example.maidy.feature_maid.auth.MaidAuthScreen
 import com.example.maidy.feature_maid.booking_details.MaidBookingDetailsScreen
 import com.example.maidy.feature_maid.edit_profile.MaidEditProfileScreen
@@ -121,6 +122,9 @@ fun MaidNavHost(
                 MaidHomeScreen(
                     onBookingClick = { bookingId ->
                         navController.navigate(MaidScreen.bookingDetails(bookingId))
+                    },
+                    onNavigateToAllBookings = {
+                        navController.navigate(MaidScreen.AllBookings.route)
                     }
                 )
             }
@@ -149,6 +153,15 @@ fun MaidNavHost(
                 MaidEditProfileScreen(
                     onNavigateBack = {
                         navController.popBackStack()
+                    }
+                )
+            }
+
+            // All Bookings Screen - View All Bookings with Filters
+            composable(route = MaidScreen.AllBookings.route) {
+                MaidAllBookingsScreen(
+                    onNavigateToBookingDetails = { bookingId ->
+                        navController.navigate(MaidScreen.bookingDetails(bookingId))
                     }
                 )
             }
