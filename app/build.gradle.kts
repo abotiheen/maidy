@@ -8,6 +8,22 @@ android {
     namespace = "com.example.maidy"
     compileSdk = 36
 
+    flavorDimensions += "appType"
+
+    productFlavors {
+        create("customer") {
+            dimension = "appType"
+            // No applicationIdSuffix. This flavor will use the base ID.
+            resValue("string", "app_name", "Maidy")
+        }
+        create("maid") {
+            dimension = "appType"
+            applicationIdSuffix = ".maid"
+            versionNameSuffix = "-maid"
+            resValue("string", "app_name", "Maidy for Maids")
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.maidy"
         minSdk = 24

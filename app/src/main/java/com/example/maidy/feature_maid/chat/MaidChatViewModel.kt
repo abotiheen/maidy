@@ -24,7 +24,16 @@ class MaidChatViewModel(
         if (_messages.value.isEmpty()) {
             _messages.value = listOf(
                 ChatMessage(
-                    content = "Hi! I'm your Maidy assistant. You can ask me anything about your jobs, schedule, or bookings!",
+                    content = """
+                    Hi! I'm your Maidy assistant 👋
+                    
+                    I can:
+                    • Retrieve your current bookings and upcoming schedule.
+                    • Help you find details for a specific job (date, customer, status).
+                    • Update the status of a specific booking when you tell me the Booking ID (for example: confirm a booking).
+                    
+                    Try: "Show my bookings" or "Confirm booking 12345".
+                """.trimIndent(),
                     timestamp = Timestamp(Date()),
                     isFromUser = false
                 )

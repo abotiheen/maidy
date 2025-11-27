@@ -17,6 +17,7 @@ import com.example.maidy.feature.auth.AuthScreen
 import com.example.maidy.feature_maid.navigation.MaidNavHost
 import com.example.maidy.navigation.MaidyNavHost
 import com.example.maidy.ui.theme.MaidyTheme
+import com.example.maidy.BuildConfig
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,9 +35,23 @@ class MainActivity : ComponentActivity() {
                     }
                 )
 
-                MaidNavHost(
-                    navController = rememberNavController(),
-                )
+                val navController = rememberNavController()
+
+                // Check the flavor and show the correct UI
+                when (BuildConfig.FLAVOR) {
+                    "maid" -> {
+                        // If the flavor is 'maid', show the MaidNavHost
+                        MaidNavHost(navController = navController)
+                    }
+                    "customer" -> {
+                        // If the flavor is 'customer', show the MaidyNavHost
+                        MaidyNavHost(navController = navController)
+                    }
+                    else -> {
+                        // As a fallback, default to the customer UI
+                        MaidyNavHost(navController = navController)
+                    }
+                }
             }
         }
     }
