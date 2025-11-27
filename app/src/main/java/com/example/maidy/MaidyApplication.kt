@@ -19,16 +19,16 @@ class MaidyApplication : Application() {
         // Initialize Firebase
         FirebaseApp.initializeApp(this)
 
-        // Initialize App Check
-        val firebaseAppCheck = FirebaseAppCheck.getInstance()
-
-        // TEMPORARY: Use Debug provider for testing locally installed APKs
-        // Play Integrity requires installation from Play Store
-        Log.d("AppCheckSetup", "Using Debug App Check Provider for testing")
-
-        firebaseAppCheck.installAppCheckProviderFactory(
-            DebugAppCheckProviderFactory.getInstance()
-        )
+//        // Initialize App Check
+//        val firebaseAppCheck = FirebaseAppCheck.getInstance()
+//
+//        // TEMPORARY: Use Debug provider for testing locally installed APKs
+//        // Play Integrity requires installation from Play Store
+//        Log.d("AppCheckSetup", "Using Debug App Check Provider for testing")
+//
+//        firebaseAppCheck.installAppCheckProviderFactory(
+//            DebugAppCheckProviderFactory.getInstance()
+//        )
 
         /* TODO: Switch to Play Integrity after uploading to Play Store:
         val isDebuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0

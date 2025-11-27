@@ -155,10 +155,10 @@ private fun BookingStatusContent(
                     }
 
                     // DEBUG: Status changer (to be removed later)
-//                    DebugStatusChanger(
-//                        currentStatus = uiState.currentStatus,
-//                        onStatusChange = onDebugStatusChange
-//                    )
+                    DebugStatusChanger(
+                        currentStatus = uiState.currentStatus,
+                        onStatusChange = onDebugStatusChange
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
                 }

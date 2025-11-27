@@ -37,8 +37,7 @@ class MaidGeminiChatService(
     private val updateBookingStatusTool = FunctionDeclaration(
         name = "updateBookingStatus",
         description = """
-            Update the status of exactly ONE booking that is assigned to the currently logged-in maid.
-            Requires an exact bookingId. You can conclude what is the booking id if the user is referring to a specific booking by its status, date, or other details that identify the booking, but if you are not sure what booking the user is referring to never guess the id for the booking. Must not update any other booking.
+            Update the status of exactly ONE booking that is assigned to the currently logged-in maid. You can conclude what is the booking id if the user is referring to a specific booking by its status, date, or other details that identify the booking, but if you are not sure what booking the user is referring to never guess the id for the booking. Must not update any other booking.
         """.trimIndent(),
         parameters = mapOf(
             "bookingId" to Schema.string(
