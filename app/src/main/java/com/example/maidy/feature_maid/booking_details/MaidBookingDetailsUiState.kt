@@ -9,8 +9,11 @@ data class MaidBookingDetailsUiState(
     val booking: Booking? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isUpdatingStatus: Boolean = false,
-    val successMessage: String? = null
+    val isUpdatingPrimary: Boolean = false,  // Loading for primary action button
+    val isUpdatingSecondary: Boolean = false, // Loading for secondary action button
+    val successMessage: String? = null,
+    val showCancelDialog: Boolean = false,    // Show cancel confirmation dialog
+    val showRejectDialog: Boolean = false     // Show reject confirmation dialog
 )
 
 /**
@@ -19,8 +22,12 @@ data class MaidBookingDetailsUiState(
 sealed class MaidBookingDetailsEvent {
     data object LoadBooking : MaidBookingDetailsEvent()
     data object AcceptBooking : MaidBookingDetailsEvent()
-    data object RejectBooking : MaidBookingDetailsEvent()
-    data object CancelBooking : MaidBookingDetailsEvent()
+    data object ShowRejectDialog : MaidBookingDetailsEvent()
+    data object DismissRejectDialog : MaidBookingDetailsEvent()
+    data object ConfirmRejectBooking : MaidBookingDetailsEvent()
+    data object ShowCancelDialog : MaidBookingDetailsEvent()
+    data object DismissCancelDialog : MaidBookingDetailsEvent()
+    data object ConfirmCancelBooking : MaidBookingDetailsEvent()
     data object MarkOnTheWay : MaidBookingDetailsEvent()
     data object MarkInProgress : MaidBookingDetailsEvent()
     data object MarkCompleted : MaidBookingDetailsEvent()

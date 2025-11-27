@@ -10,9 +10,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import com.example.maidy.core.components.ConfirmationDialog
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -156,10 +158,11 @@ fun MaidBookingDetailsScreen(
                 item {
                     ActionButtons(
                         status = uiState.booking!!.status,
-                        isUpdating = uiState.isUpdatingStatus,
+                        isUpdatingPrimary = uiState.isUpdatingPrimary,
+                        isUpdatingSecondary = uiState.isUpdatingSecondary,
                         onAccept = { viewModel.onEvent(MaidBookingDetailsEvent.AcceptBooking) },
-                        onReject = { viewModel.onEvent(MaidBookingDetailsEvent.RejectBooking) },
-                        onCancel = { viewModel.onEvent(MaidBookingDetailsEvent.CancelBooking) },
+                        onReject = { viewModel.onEvent(MaidBookingDetailsEvent.ShowRejectDialog) },
+                        onCancel = { viewModel.onEvent(MaidBookingDetailsEvent.ShowCancelDialog) },
                         onMarkOnTheWay = { viewModel.onEvent(MaidBookingDetailsEvent.MarkOnTheWay) },
                         onMarkInProgress = { viewModel.onEvent(MaidBookingDetailsEvent.MarkInProgress) },
                         onMarkCompleted = { viewModel.onEvent(MaidBookingDetailsEvent.MarkCompleted) }
@@ -173,6 +176,36 @@ fun MaidBookingDetailsScreen(
             }
         }
     }
+
+    // Reject Confirmation Dialog
+    ConfirmationDialog(
+        isVisible = uiState.showRejectDialog,
+        icon = Icons.Default.Close,
+        iconBackgroundColor = Color(0xFFFEE2E2),
+        iconTint = Color(0xFFC62828),
+        title = "Reject Booking?",
+        description = "Are you sure you want to reject this booking? The customer will be notified and this action cannot be undone.",
+        confirmButtonText = "Yes, Reject Booking",
+        confirmButtonColor = Color(0xFFC62828),
+        cancelButtonText = "Go Back",
+        onConfirm = { viewModel.onEvent(MaidBookingDetailsEvent.ConfirmRejectBooking) },
+        onDismiss = { viewModel.onEvent(MaidBookingDetailsEvent.DismissRejectDialog) }
+    )
+
+    // Cancel Confirmation Dialog
+    ConfirmationDialog(
+        isVisible = uiState.showCancelDialog,
+        icon = Icons.Default.Close,
+        iconBackgroundColor = Color(0xFFFFF3E0),
+        iconTint = Color(0xFFFF9800),
+        title = "Cancel Booking?",
+        description = "Are you sure you want to cancel this booking? The customer will be notified and this action cannot be undone.",
+        confirmButtonText = "Yes, Cancel Booking",
+        confirmButtonColor = Color(0xFFC62828),
+        cancelButtonText = "Go Back",
+        onConfirm = { viewModel.onEvent(MaidBookingDetailsEvent.ConfirmCancelBooking) },
+        onDismiss = { viewModel.onEvent(MaidBookingDetailsEvent.DismissCancelDialog) }
+    )
 }
 
 @Composable
@@ -525,7 +558,8 @@ private fun SpecialInstructionsCard(instructions: String) {
 @Composable
 private fun ActionButtons(
     status: BookingStatus,
-    isUpdating: Boolean,
+    isUpdatingPrimary: Boolean,
+    isUpdatingSecondary: Boolean,
     onAccept: () -> Unit,
     onReject: () -> Unit,
     onCancel: () -> Unit,
@@ -544,14 +578,14 @@ private fun ActionButtons(
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
-                    enabled = !isUpdating,
+                    enabled = !isUpdatingSecondary && !isUpdatingPrimary,
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = Color(0xFFC62828)
                     ),
                     border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFC62828)),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    if (isUpdating) {
+                    if (isUpdatingSecondary) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
                             color = Color(0xFFC62828),
@@ -567,14 +601,14 @@ private fun ActionButtons(
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
-                    enabled = !isUpdating,
+                    enabled = !isUpdatingPrimary && !isUpdatingSecondary,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaidAppGreen,
                         contentColor = Color.White
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    if (isUpdating) {
+                    if (isUpdatingPrimary) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
                             color = Color.White,
@@ -597,14 +631,14 @@ private fun ActionButtons(
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
-                    enabled = !isUpdating,
+                    enabled = !isUpdatingSecondary && !isUpdatingPrimary,
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = Color(0xFFC62828)
                     ),
                     border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFC62828)),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    if (isUpdating) {
+                    if (isUpdatingSecondary) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
                             color = Color(0xFFC62828),
@@ -620,14 +654,14 @@ private fun ActionButtons(
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
-                    enabled = !isUpdating,
+                    enabled = !isUpdatingPrimary && !isUpdatingSecondary,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF2196F3),
                         contentColor = Color.White
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    if (isUpdating) {
+                    if (isUpdatingPrimary) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
                             color = Color.White,
@@ -646,14 +680,14 @@ private fun ActionButtons(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = !isUpdating,
+                enabled = !isUpdatingPrimary,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF0288D1),
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                if (isUpdating) {
+                if (isUpdatingPrimary) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
                         color = Color.White,
@@ -671,14 +705,14 @@ private fun ActionButtons(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = !isUpdating,
+                enabled = !isUpdatingPrimary,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF2E7D32),
                     contentColor = Color.White
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                if (isUpdating) {
+                if (isUpdatingPrimary) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
                         color = Color.White,

@@ -29,8 +29,12 @@ class MaidBookingDetailsViewModel(
         when (event) {
             is MaidBookingDetailsEvent.LoadBooking -> loadBooking()
             is MaidBookingDetailsEvent.AcceptBooking -> acceptBooking()
-            is MaidBookingDetailsEvent.RejectBooking -> rejectBooking()
-            is MaidBookingDetailsEvent.CancelBooking -> cancelBooking()
+            is MaidBookingDetailsEvent.ShowRejectDialog -> showRejectDialog()
+            is MaidBookingDetailsEvent.DismissRejectDialog -> dismissRejectDialog()
+            is MaidBookingDetailsEvent.ConfirmRejectBooking -> rejectBooking()
+            is MaidBookingDetailsEvent.ShowCancelDialog -> showCancelDialog()
+            is MaidBookingDetailsEvent.DismissCancelDialog -> dismissCancelDialog()
+            is MaidBookingDetailsEvent.ConfirmCancelBooking -> cancelBooking()
             is MaidBookingDetailsEvent.MarkOnTheWay -> markOnTheWay()
             is MaidBookingDetailsEvent.MarkInProgress -> markInProgress()
             is MaidBookingDetailsEvent.MarkCompleted -> markCompleted()
@@ -66,27 +70,60 @@ class MaidBookingDetailsViewModel(
     private fun acceptBooking() {
         updateBookingStatus(
             newStatus = BookingStatus.CONFIRMED,
-            successMessage = "Booking accepted successfully"
+            successMessage = "Booking accepted successfully",
+            isPrimaryAction = true
         )
     }
 
     /**
-     * Reject a pending booking
+     * Show reject confirmation dialog
+     */
+    private fun showRejectDialog() {
+        _uiState.value = _uiState.value.copy(showRejectDialog = true)
+    }
+
+    /**
+     * Dismiss reject confirmation dialog
+     */
+    private fun dismissRejectDialog() {
+        _uiState.value = _uiState.value.copy(showRejectDialog = false)
+    }
+
+    /**
+     * Reject a pending booking (after confirmation)
      */
     private fun rejectBooking() {
+        _uiState.value = _uiState.value.copy(showRejectDialog = false)
         updateBookingStatus(
             newStatus = BookingStatus.CANCELLED,
-            successMessage = "Booking rejected"
+            successMessage = "Booking rejected",
+            isPrimaryAction = false
         )
     }
 
     /**
-     * Cancel a confirmed booking
+     * Show cancel confirmation dialog
+     */
+    private fun showCancelDialog() {
+        _uiState.value = _uiState.value.copy(showCancelDialog = true)
+    }
+
+    /**
+     * Dismiss cancel confirmation dialog
+     */
+    private fun dismissCancelDialog() {
+        _uiState.value = _uiState.value.copy(showCancelDialog = false)
+    }
+
+    /**
+     * Cancel a confirmed booking (after confirmation)
      */
     private fun cancelBooking() {
+        _uiState.value = _uiState.value.copy(showCancelDialog = false)
         updateBookingStatus(
             newStatus = BookingStatus.CANCELLED,
-            successMessage = "Booking cancelled"
+            successMessage = "Booking cancelled",
+            isPrimaryAction = false
         )
     }
 
@@ -96,7 +133,8 @@ class MaidBookingDetailsViewModel(
     private fun markOnTheWay() {
         updateBookingStatus(
             newStatus = BookingStatus.ON_THE_WAY,
-            successMessage = "Status updated to On the Way"
+            successMessage = "Status updated to On the Way",
+            isPrimaryAction = true
         )
     }
 
@@ -106,7 +144,8 @@ class MaidBookingDetailsViewModel(
     private fun markInProgress() {
         updateBookingStatus(
             newStatus = BookingStatus.IN_PROGRESS,
-            successMessage = "Job started"
+            successMessage = "Job started",
+            isPrimaryAction = true
         )
     }
 
@@ -115,19 +154,19 @@ class MaidBookingDetailsViewModel(
      */
     private fun markCompleted() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isUpdatingStatus = true)
+            _uiState.value = _uiState.value.copy(isUpdatingPrimary = true)
 
             val result = bookingRepository.completeBooking(bookingId)
             result.onSuccess {
                 _uiState.value = _uiState.value.copy(
-                    isUpdatingStatus = false,
+                    isUpdatingPrimary = false,
                     successMessage = "Job completed successfully"
                 )
                 // Reload booking to get updated data
                 loadBooking()
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
-                    isUpdatingStatus = false,
+                    isUpdatingPrimary = false,
                     errorMessage = "Failed to complete booking: ${error.message}"
                 )
             }
@@ -137,21 +176,31 @@ class MaidBookingDetailsViewModel(
     /**
      * Update booking status
      */
-    private fun updateBookingStatus(newStatus: BookingStatus, successMessage: String) {
+    private fun updateBookingStatus(
+        newStatus: BookingStatus,
+        successMessage: String,
+        isPrimaryAction: Boolean
+    ) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isUpdatingStatus = true)
+            if (isPrimaryAction) {
+                _uiState.value = _uiState.value.copy(isUpdatingPrimary = true)
+            } else {
+                _uiState.value = _uiState.value.copy(isUpdatingSecondary = true)
+            }
 
             val result = bookingRepository.updateBookingStatus(bookingId, newStatus)
             result.onSuccess {
                 _uiState.value = _uiState.value.copy(
-                    isUpdatingStatus = false,
+                    isUpdatingPrimary = false,
+                    isUpdatingSecondary = false,
                     successMessage = successMessage
                 )
                 // Reload booking to get updated data
                 loadBooking()
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
-                    isUpdatingStatus = false,
+                    isUpdatingPrimary = false,
+                    isUpdatingSecondary = false,
                     errorMessage = "Failed to update status: ${error.message}"
                 )
             }

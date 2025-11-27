@@ -38,7 +38,7 @@ fun MaidyLogo(
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(R.drawable.maidy_logo),
+            painter = painterResource(R.drawable.maidy_customer),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
