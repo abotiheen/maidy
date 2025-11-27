@@ -51,12 +51,12 @@ fun MaidHomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onNavigateToChat,
-                containerColor = MaidAppGreen
+                containerColor = MaidAppBackgroundLight
             ) {
                 Icon(
                     painter = painterResource(id = com.example.maidy.R.drawable.robot),
                     contentDescription = "Gemini Chat",
-                    tint = Color.White,
+                    tint = MaidAppGreen,
                     modifier = Modifier.size(28.dp)
                 )
             }
