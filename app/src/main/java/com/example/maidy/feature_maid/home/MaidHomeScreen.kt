@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,136 +42,155 @@ fun MaidHomeScreen(
     viewModel: MaidHomeViewModel = koinViewModel(),
     onBookingClick: (String) -> Unit = {},
     onNavigateToAllBookings: () -> Unit = {},
+    onNavigateToChat: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaidAppBackgroundLight)
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Top spacing
-        item { Spacer(modifier = Modifier.height(8.dp)) }
-
-        // Welcome Header
-        item {
-            MaidWelcomeHeader(
-                maidName = uiState.maid?.fullName ?: "",
-                profileImageUrl = uiState.maid?.profileImageUrl ?: "",
-                isLoading = uiState.isLoading
-            )
-        }
-
-        // Availability Card
-        item {
-            MaidAvailabilityCard(
-                isAvailable = uiState.isAvailable,
-                isUpdating = uiState.isUpdatingAvailability,
-                onToggle = { isAvailable ->
-                    viewModel.onEvent(MaidHomeEvent.ToggleAvailability(isAvailable))
-                }
-            )
-        }
-
-        // Manage Bookings Button
-        item {
-            Button(
-                onClick = onNavigateToAllBookings,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1E293B),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(16.dp)
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onNavigateToChat,
+                containerColor = MaidAppGreen
             ) {
-                Text(
-                    text = "Manage My Bookings",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                Icon(
+                    painter = painterResource(id = com.example.maidy.R.drawable.robot),
+                    contentDescription = "Gemini Chat",
+                    tint = Color.White,
+                    modifier = Modifier.size(28.dp)
                 )
             }
-        }
+        },
+        containerColor = MaidAppBackgroundLight
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .background(MaidAppBackgroundLight)
+                .padding(horizontal = 16.dp)
+                .padding(paddingValues),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Top spacing
+            item { Spacer(modifier = Modifier.height(8.dp)) }
 
-        // Recent Bookings Section
-        item {
-            Text(
-                text = "Your Recent Bookings",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF000000),
-                modifier = Modifier.padding(top = 8.dp)
-            )
-        }
-
-        // Loading state
-        if (uiState.isLoadingBookings) {
+            // Welcome Header
             item {
-                Box(
+                MaidWelcomeHeader(
+                    maidName = uiState.maid?.fullName ?: "",
+                    profileImageUrl = uiState.maid?.profileImageUrl ?: "",
+                    isLoading = uiState.isLoading
+                )
+            }
+
+            // Availability Card
+            item {
+                MaidAvailabilityCard(
+                    isAvailable = uiState.isAvailable,
+                    isUpdating = uiState.isUpdatingAvailability,
+                    onToggle = { isAvailable ->
+                        viewModel.onEvent(MaidHomeEvent.ToggleAvailability(isAvailable))
+                    }
+                )
+            }
+
+            // Manage Bookings Button
+            item {
+                Button(
+                    onClick = onNavigateToAllBookings,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp),
-                    contentAlignment = Alignment.Center
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF1E293B),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
-                    CircularProgressIndicator(color = MaidAppGreen)
+                    Text(
+                        text = "Manage My Bookings",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
-        }
 
-        // Bookings list
-        items(uiState.recentBookings) { booking ->
-            MaidBookingItem(
-                booking = booking,
-                onClick = { onBookingClick(booking.id) }
-            )
-        }
-
-        // Empty state
-        if (!uiState.isLoadingBookings && uiState.recentBookings.isEmpty()) {
+            // Recent Bookings Section
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(20.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Column(
+                Text(
+                    text = "Your Recent Bookings",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF000000),
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
+            // Loading state
+            if (uiState.isLoadingBookings) {
+                item {
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "No bookings yet",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF000000)
-                        )
-                        Text(
-                            text = "New bookings will appear here",
-                            fontSize = 14.sp,
-                            color = Color(0xFF6B7280)
-                        )
+                        CircularProgressIndicator(color = MaidAppGreen)
                     }
                 }
             }
+
+            // Bookings list
+            items(uiState.recentBookings) { booking ->
+                MaidBookingItem(
+                    booking = booking,
+                    onClick = { onBookingClick(booking.id) }
+                )
+            }
+
+            // Empty state
+            if (!uiState.isLoadingBookings && uiState.recentBookings.isEmpty()) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(20.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "No bookings yet",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF000000)
+                            )
+                            Text(
+                                text = "New bookings will appear here",
+                                fontSize = 14.sp,
+                                color = Color(0xFF6B7280)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Bottom spacing
+            item { Spacer(modifier = Modifier.height(16.dp)) }
         }
 
-        // Bottom spacing
-        item { Spacer(modifier = Modifier.height(16.dp)) }
-    }
-
-    // Error handling
-    uiState.errorMessage?.let { error ->
-        LaunchedEffect(error) {
-            // Show error toast or snackbar
-            kotlinx.coroutines.delay(3000)
-            viewModel.onEvent(MaidHomeEvent.ClearError)
+        // Error handling
+        uiState.errorMessage?.let { error ->
+            LaunchedEffect(error) {
+                // Show error toast or snackbar
+                kotlinx.coroutines.delay(3000)
+                viewModel.onEvent(MaidHomeEvent.ClearError)
+            }
         }
     }
 }

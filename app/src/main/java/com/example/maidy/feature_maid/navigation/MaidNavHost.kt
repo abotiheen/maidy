@@ -23,6 +23,7 @@ import com.example.maidy.feature_maid.auth.MaidAppTextPrimary
 import com.example.maidy.feature_maid.all_bookings.MaidAllBookingsScreen
 import com.example.maidy.feature_maid.auth.MaidAuthScreen
 import com.example.maidy.feature_maid.booking_details.MaidBookingDetailsScreen
+import com.example.maidy.feature_maid.chat.MaidChatScreen
 import com.example.maidy.feature_maid.edit_profile.MaidEditProfileScreen
 import com.example.maidy.feature_maid.home.MaidHomeScreen
 import com.example.maidy.feature_maid.profile.MaidProfileScreen
@@ -125,6 +126,9 @@ fun MaidNavHost(
                     },
                     onNavigateToAllBookings = {
                         navController.navigate(MaidScreen.AllBookings.route)
+                    },
+                    onNavigateToChat = {
+                        navController.navigate("maid_chat")
                     }
                 )
             }
@@ -183,6 +187,11 @@ fun MaidNavHost(
                         navController.popBackStack()
                     }
                 )
+            }
+
+            // Maid Chat Screen - powered by Gemini for maids
+            composable(route = MaidScreen.MaidChat.route) {
+                MaidChatScreen(onNavigateBack = { navController.popBackStack() })
             }
         }
     }

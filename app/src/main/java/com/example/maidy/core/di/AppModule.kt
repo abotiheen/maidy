@@ -9,6 +9,7 @@ import com.example.maidy.core.data.SessionManager
 import com.example.maidy.core.data.UserRepository
 import com.example.maidy.core.service.FcmTokenManager
 import com.example.maidy.core.service.GeminiChatService
+import com.example.maidy.core.service.MaidGeminiChatService
 import com.example.maidy.core.service.NotificationService
 import com.example.maidy.core.util.ImageCompressor
 import com.example.maidy.feature.admin.AdminAddMaidViewModel
@@ -20,6 +21,7 @@ import com.example.maidy.feature.edit_profile.EditProfileViewModel
 import com.example.maidy.feature.rating.RatingViewModel
 import com.example.maidy.feature_maid.auth.MaidAuthViewModel
 import com.example.maidy.feature_maid.booking_details.MaidBookingDetailsViewModel
+import com.example.maidy.feature_maid.chat.MaidChatViewModel
 import com.example.maidy.feature_maid.profile.MaidProfileViewModel as MaidOwnProfileViewModel
 import com.example.maidy.feature_maid.edit_profile.MaidEditProfileViewModel
 import com.example.maidy.feature_maid.home.MaidHomeViewModel
@@ -57,6 +59,7 @@ val appModule = module {
     single { FcmTokenManager(get(), get()) }  // Now accepts both UserRepository and MaidRepository
     single { NotificationService(get(), get()) }
     single { GeminiChatService(get(), get(), get()) }
+    single { MaidGeminiChatService(get(), get()) }
 
     // Repositories
     single { AuthRepository(get()) }
@@ -86,4 +89,5 @@ val appModule = module {
     viewModel { (bookingId: String) -> RatingViewModel(bookingId, get(), get(), get(), get()) }
     viewModel { EditProfileViewModel(get(), get(), get()) }
     viewModel { ChatViewModel(get()) }
+    viewModel { MaidChatViewModel(get()) }
 }

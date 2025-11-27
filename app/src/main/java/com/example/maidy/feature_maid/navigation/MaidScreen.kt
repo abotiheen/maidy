@@ -38,6 +38,9 @@ sealed class MaidScreen(
      */
     data object EditProfile : MaidScreen("maid_edit_profile", "Edit Profile")
 
+    data object MaidChat : MaidScreen("maid_chat", "Assistant Chat")
+
+
     /**
      * All Bookings screen - view all bookings with filters
      */
@@ -65,6 +68,7 @@ fun getMaidScreenFromRoute(route: String?): MaidScreen {
         route.startsWith("maid_profile") -> MaidScreen.Profile
         route.startsWith("maid_booking_details") -> MaidScreen.EditProfile // Placeholder
         route.startsWith("maid_terms_and_conditions") -> MaidScreen.TermsAndConditions
+        route.startsWith("maid_chat") -> MaidScreen.MaidChat
         else -> MaidScreen.Auth
     }
 }
