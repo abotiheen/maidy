@@ -230,7 +230,9 @@ fun BookingDetailsScreen(
                         )
                     }
                 }
-                
+
+                PaymentMethodSelector()
+
                 // Special Instructions Field
                 SpecialInstructionsField(
                     value = uiState.specialInstructions,
