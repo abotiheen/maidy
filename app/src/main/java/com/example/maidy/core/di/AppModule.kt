@@ -1,5 +1,6 @@
 package com.example.maidy.core.di
 
+import com.example.maidy.MainViewModel
 import com.example.maidy.core.data.AuthRepository
 import com.example.maidy.core.data.BookingRepository
 import com.example.maidy.core.data.ChatRepository
@@ -80,6 +81,7 @@ val appModule = module {
     viewModel { HomeViewModel(get(), get(), get()) }
     viewModel { AdminAddMaidViewModel(get(), get()) }
     viewModel { MaidListViewModel(get()) }
+    viewModel { MainViewModel(get()) }
     viewModel { MaidProfileViewModel(get()) }
     viewModel { SearchViewModel(get()) }
     viewModel { AllBookingsViewModel(get(), get()) }

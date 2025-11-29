@@ -96,7 +96,7 @@ private fun ActionButton(
             
             Text(
                 text = text,
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = textColor
             )
