@@ -143,6 +143,9 @@ private fun MaidListScreenContent(
                             },
                             onViewDetailsClick = {
                                 onNavigateToMaidDetails(maid.id)
+                            },
+                            onDeleteClick = {
+                                onEvent(MaidListUiEvent.OnDeleteMaidClick(maid.id))
                             }
                         )
                     }

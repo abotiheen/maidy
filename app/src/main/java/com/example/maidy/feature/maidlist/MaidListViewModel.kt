@@ -30,6 +30,7 @@ sealed class MaidListUiEvent {
     data class OnFilterChipClick(val filterId: String) : MaidListUiEvent()
     data class OnSelectMaidClick(val maidId: String) : MaidListUiEvent()
     data class OnViewDetailsClick(val maidId: String) : MaidListUiEvent()
+    data class OnDeleteMaidClick(val maidId: String) : MaidListUiEvent()
 }
 
 class MaidListViewModel(
@@ -56,6 +57,9 @@ class MaidListViewModel(
             }
             is MaidListUiEvent.OnViewDetailsClick -> {
                 // TODO: Navigate to maid details screen
+            }
+            is MaidListUiEvent.OnDeleteMaidClick -> {
+                deleteMaid(event.maidId)
             }
         }
     }
@@ -129,5 +133,20 @@ class MaidListViewModel(
             )
         }
     }
-}
 
+    private fun deleteMaid(maidId: String) {
+        viewModelScope.launch {
+            maidRepository.deleteMaid(maidId)
+                .onSuccess {
+                    loadMaids()
+                }
+                .onFailure { error ->
+                    _uiState.update {
+                        it.copy(
+                            errorMessage = "Failed to delete maid: ${error.message}"
+                        )
+                    }
+                }
+        }
+    }
+}

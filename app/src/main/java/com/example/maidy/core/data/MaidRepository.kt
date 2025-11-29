@@ -352,4 +352,23 @@ class MaidRepository(
             Result.failure(e)
         }
     }
+
+    /**
+     * Delete a maid from the maids collection
+     */
+    suspend fun deleteMaid(maidId: String): Result<Unit> {
+        return try {
+            println("🗑️ MaidRepository: Deleting maid - ID: $maidId")
+            firestore.collection("maids")
+                .document(maidId)
+                .delete()
+                .await()
+            println("✅ MaidRepository: Maid deleted successfully")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            println("❌ MaidRepository: Failed to delete maid - ${e.message}")
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
 }
